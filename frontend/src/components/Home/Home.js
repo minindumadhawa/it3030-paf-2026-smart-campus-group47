@@ -2,8 +2,10 @@ import React from 'react';
 import './Home.css';
 import { Building2, Wrench, Calendar, Bell, ChevronRight, UserCircle } from 'lucide-react';
 import logo from '../../images/SLIIT.png';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
+  const navigate = useNavigate();
   return (
     <div className="home-container">
       {/* Navigation Bar */}
@@ -16,7 +18,7 @@ const Home = () => {
           <a href="#services" className="nav-link">Services</a>
           <a href="#about" className="nav-link">About</a>
           <a href="#contact" className="nav-link">Contact</a>
-          <button className="auth-btn">
+          <button className="auth-btn" onClick={() => navigate('/login')}>
             <UserCircle size={20} />
             <span>Login</span>
           </button>
