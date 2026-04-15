@@ -1,6 +1,7 @@
 import React from 'react';
 import './Home.css';
 import { Building2, Wrench, Calendar, Bell, ChevronRight, UserCircle } from 'lucide-react';
+import logo from '../../images/SLIIT.png';
 
 const Home = () => {
   return (
@@ -8,9 +9,7 @@ const Home = () => {
       {/* Navigation Bar */}
       <nav className="navbar">
         <div className="nav-brand">
-          <div className="brand-logo">
-            <span className="logo-text">SLIIT</span>
-          </div>
+          <img src={logo} alt="SLIIT Logo" className="navbar-logo" />
           <span className="brand-title">Smart Campus Operations Hub</span>
         </div>
         <div className="nav-links">
@@ -65,7 +64,7 @@ const Home = () => {
           <h2>Our Core Services</h2>
           <p>Streamlined access to essential campus operations</p>
         </div>
-        
+
         <div className="services-grid">
           {/* Facility Bookings Card */}
           <div className="service-card interactive-card">

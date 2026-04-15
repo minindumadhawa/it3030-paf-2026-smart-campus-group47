@@ -62,11 +62,10 @@
   box-shadow: 0 4px 10px rgba(243, 112, 33, 0.3);
 }
 
-.logo-text {
-  color: var(--white);
-  font-weight: 800;
-  font-size: 1.2rem;
-  letter-spacing: 1px;
+.navbar-logo {
+  height: 45px;
+  width: auto;
+  object-fit: contain;
 }
 
 .brand-title {
