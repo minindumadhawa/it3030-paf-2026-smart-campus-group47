@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './LoginPage.css';
 import logo from '../../images/SLIIT.png';
 import { Mail, Lock, LogIn } from 'lucide-react';
 
 const LoginPage = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -86,6 +88,9 @@ const LoginPage = () => {
         <div className="login-footer">
           <p className="footer-note">
             Please use your SLIIT staff email to proceed
+          </p>
+          <p className="footer-note" style={{ marginTop: '10px' }}>
+            Don't have an account? <span style={{ color: '#f97316', fontWeight: '600', cursor: 'pointer', textDecoration: 'none' }} onClick={() => navigate('/register')} onMouseOver={(e) => e.target.style.textDecoration = 'underline'} onMouseOut={(e) => e.target.style.textDecoration = 'none'}>Register here</span>
           </p>
         </div>
       </div>
