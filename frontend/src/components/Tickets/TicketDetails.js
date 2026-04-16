@@ -1,28 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+import { ChevronLeft, Calendar, User, Mail, MapPin, Phone, CheckCircle, XCircle, Clock, AlertCircle, LogOut } from 'lucide-react';
+import ticketService from '../../services/ticketService';
 import './TicketDetails.css';
 
-const statusColors = {
-  OPEN: 'status-open',
-  IN_PROGRESS: 'status-in-progress',
-  RESOLVED: 'status-resolved',
-  REJECTED: 'status-rejected',
-  CLOSED: 'status-closed',
-};
-
-const statusLabels = {
-  OPEN: 'Open',
-  IN_PROGRESS: 'In Progress',
-  RESOLVED: 'Resolved',
-  REJECTED: 'Rejected',
-  CLOSED: 'Closed',
-};
-
-const priorityColors = {
-  LOW: 'priority-low',
-  MEDIUM: 'priority-medium',
-  HIGH: 'priority-high',
-  URGENT: 'priority-urgent',
+const statusIcons = {
+  OPEN: <Clock size={20} />,
+  IN_PROGRESS: <Clock size={20} />,
+  RESOLVED: <CheckCircle size={20} />,
+  REJECTED: <XCircle size={20} />,
+  CLOSED: <CheckCircle size={20} />,
 };
 
 const TicketDetails = () => {
@@ -47,21 +34,10 @@ const TicketDetails = () => {
   const fetchTicket = async (ticketId, userId, role) => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/tickets/${ticketId}?userId=${userId}&role=${role}`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setTicket(data);
-      } else if (response.status === 404) {
-        setErrorMsg('Ticket not found.');
-      } else if (response.status === 403) {
-        setErrorMsg('Access denied. You can only view your own tickets.');
-      } else {
-        setErrorMsg('Failed to load ticket details.');
-      }
+      const data = await ticketService.getTicketById(ticketId, userId, role);
+      setTicket(data);
     } catch (err) {
-      setErrorMsg('Server error. Please make sure the backend is running.');
+      setErrorMsg(err.message || 'Failed to load ticket details.');
     } finally {
       setLoading(false);
     }
@@ -80,108 +56,117 @@ const TicketDetails = () => {
   return (
     <div className="ticket-page-container">
       <nav className="ticket-nav">
-        <div className="nav-logo">Smart Campus Hub</div>
+        <div className="nav-logo">SLIIT Smart Campus</div>
         <div className="nav-links">
-          <button className="nav-link-btn" onClick={() => navigate('/tickets/my')}>My Tickets</button>
           <button className="nav-link-btn" onClick={() => navigate('/dashboard')}>Dashboard</button>
+          <button className="nav-link-btn" onClick={() => navigate('/tickets/my')}>My Tickets</button>
           <button className="logout-btn" onClick={() => { localStorage.removeItem('user'); navigate('/login'); }}>
-            Logout
+            <LogOut size={16} /> Logout
           </button>
         </div>
       </nav>
 
       <main className="details-main">
-        <button className="back-btn" onClick={() => navigate('/tickets/my')}>
-          ← Back to My Tickets
-        </button>
+        <Link to="/tickets/my" className="back-link">
+          <ChevronLeft size={20} /> Back to My Tickets
+        </Link>
 
-        {loading && <div className="loading-spinner">Loading ticket details...</div>}
-        {errorMsg && <div className="alert-error">{errorMsg}</div>}
-
-        {ticket && (
+        {loading ? (
+          <div className="loading-spinner">Fetching ticket details...</div>
+        ) : errorMsg ? (
+          <div className="alert-error">{errorMsg}</div>
+        ) : (
           <div className="details-card">
             <div className="details-header">
               <div>
-                <p className="detail-label">Ticket #{ticket.id}</p>
+                <p className="ticket-id-label">Ticket ID: #{ticket.id}</p>
                 <h1 className="ticket-title-heading">{ticket.category.replace('_', ' ')}</h1>
               </div>
-              <span className={`status-badge ${statusColors[ticket.status]}`}>
-                {statusLabels[ticket.status]}
+              <span className={`status-badge-large status-${ticket.status.toLowerCase().replace('_', '-')}`} style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                {statusIcons[ticket.status]} {ticket.status.replace('_', ' ')}
               </span>
             </div>
 
-            <div className="details-grid">
-              {/* Description */}
-              <div className="detail-block full-width">
-                <p className="detail-label">Description</p>
-                <p className="detail-value">{ticket.description}</p>
-              </div>
+            <div className="details-body">
+              <div className="details-grid">
+                {/* Description */}
+                <div className="detail-block full-width">
+                  <p className="detail-label">Issue Description</p>
+                  <p className="detail-value" style={{fontSize: '1.2rem', whiteSpace: 'pre-line'}}>{ticket.description}</p>
+                </div>
 
-              {/* Priority */}
-              <div className="detail-block">
-                <p className="detail-label">Priority</p>
-                <span className={`priority-badge ${priorityColors[ticket.priority]}`}>
-                  {ticket.priority}
-                </span>
-              </div>
+                {/* Priority */}
+                <div className="detail-block">
+                  <p className="detail-label">Priority Level</p>
+                  <span className="priority-badge-large">
+                    <AlertCircle size={18} style={{color: 'var(--primary-orange)'}}/> {ticket.priority}
+                  </span>
+                </div>
 
-              {/* Category */}
-              <div className="detail-block">
-                <p className="detail-label">Category</p>
-                <p className="detail-value">{ticket.category.replace('_', ' ')}</p>
-              </div>
-
-              {/* Location */}
-              {ticket.locationOrResource && (
+                {/* Location */}
                 <div className="detail-block">
                   <p className="detail-label">Location / Resource</p>
-                  <p className="detail-value">📍 {ticket.locationOrResource}</p>
+                  <p className="detail-value">
+                    <MapPin size={18} style={{marginRight: '8px', verticalAlign: 'middle', color: 'var(--primary-orange)'}}/>
+                    {ticket.locationOrResource || 'Not specified'}
+                  </p>
                 </div>
-              )}
 
-              {/* Preferred Contact */}
-              {ticket.preferredContactDetails && (
+                {/* Submitted By */}
+                <div className="detail-block">
+                  <p className="detail-label">Submitted By</p>
+                  <p className="detail-value">
+                    <User size={18} style={{marginRight: '8px', verticalAlign: 'middle'}}/>
+                    {ticket.userFullName}
+                  </p>
+                  <p className="detail-sub">
+                    <Mail size={14} style={{marginRight: '8px', verticalAlign: 'middle'}}/>
+                    {ticket.userEmail}
+                  </p>
+                </div>
+
+                {/* Contact */}
                 <div className="detail-block">
                   <p className="detail-label">Preferred Contact</p>
-                  <p className="detail-value">📞 {ticket.preferredContactDetails}</p>
+                  <p className="detail-value">
+                    <Phone size={18} style={{marginRight: '8px', verticalAlign: 'middle'}}/>
+                    {ticket.preferredContactDetails || 'Default (Email)'}
+                  </p>
+                </div>
+
+                {/* Timestamps */}
+                <div className="detail-block">
+                  <p className="detail-label">Created On</p>
+                  <p className="detail-value">
+                    <Calendar size={18} style={{marginRight: '8px', verticalAlign: 'middle'}}/>
+                    {formatDate(ticket.createdAt)}
+                  </p>
+                </div>
+
+                <div className="detail-block">
+                  <p className="detail-label">Last Updated</p>
+                  <p className="detail-value">
+                    <Clock size={18} style={{marginRight: '8px', verticalAlign: 'middle'}}/>
+                    {formatDate(ticket.updatedAt)}
+                  </p>
+                </div>
+              </div>
+
+              {/* Rejection/Resolution Sections */}
+              {ticket.status === 'REJECTED' && (
+                <div className="info-block rejected-block">
+                  <p className="detail-label" style={{color: '#991b1b'}}>Rejection Reason</p>
+                  <p className="detail-value">{ticket.rejectionReason || 'No reason provided.'}</p>
                 </div>
               )}
 
-              {/* Submitted By */}
-              <div className="detail-block">
-                <p className="detail-label">Submitted By</p>
-                <p className="detail-value">{ticket.userFullName}</p>
-                <p className="detail-sub">{ticket.userEmail}</p>
-              </div>
-
-              {/* Created At */}
-              <div className="detail-block">
-                <p className="detail-label">Created At</p>
-                <p className="detail-value">{formatDate(ticket.createdAt)}</p>
-              </div>
-
-              {/* Updated At */}
-              <div className="detail-block">
-                <p className="detail-label">Last Updated</p>
-                <p className="detail-value">{formatDate(ticket.updatedAt)}</p>
-              </div>
+              {ticket.status === 'RESOLVED' && (
+                <div className="info-block resolved-block">
+                  <p className="detail-label" style={{color: '#065f46'}}>Resolution Notes</p>
+                  <p className="detail-value">{ticket.resolutionNotes || 'Task completed.'}</p>
+                </div>
+              )}
             </div>
-
-            {/* Rejection Reason - only if REJECTED */}
-            {ticket.status === 'REJECTED' && ticket.rejectionReason && (
-              <div className="info-block rejected-block">
-                <p className="detail-label">Rejection Reason</p>
-                <p className="detail-value">{ticket.rejectionReason}</p>
-              </div>
-            )}
-
-            {/* Resolution Notes - only if RESOLVED */}
-            {ticket.status === 'RESOLVED' && ticket.resolutionNotes && (
-              <div className="info-block resolved-block">
-                <p className="detail-label">Resolution Notes</p>
-                <p className="detail-value">{ticket.resolutionNotes}</p>
-              </div>
-            )}
           </div>
         )}
       </main>

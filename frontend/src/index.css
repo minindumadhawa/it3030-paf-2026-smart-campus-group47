@@ -1,0 +1,38 @@
+:root {
+  /* Core Brand Colors */
+  --primary-orange: #F37021;
+  --primary-orange-dark: #cc5b18;
+  --primary-orange-light: #fbe2d2;
+  --navy-blue: #0b2239; /* Used only for text/headings */
+  
+  /* Background & Neutrals */
+  --bg-color: #f8fafc;
+  --card-bg: #ffffff;
+  --border-color: rgba(0, 0, 0, 0.08);
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  
+  /* Gradients */
+  --gradient-orange: linear-gradient(135deg, #F37021 0%, #ff8c40 100%);
+  --gradient-soft: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+  
+  /* Shadows & Glass */
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  line-height: 1.5;
+}

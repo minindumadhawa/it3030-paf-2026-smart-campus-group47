@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Wrench, MapPin, Phone, AlertCircle, ChevronLeft, LogOut } from 'lucide-react';
+import ticketService from '../../services/ticketService';
 import './CreateTicket.css';
 
 const CreateTicket = () => {
@@ -36,7 +38,6 @@ const CreateTicket = () => {
     setErrorMsg('');
     setSuccessMsg('');
 
-    // Basic validation
     if (!formData.category) { setErrorMsg('Please select a category.'); return; }
     if (!formData.description.trim() || formData.description.trim().length < 10) {
       setErrorMsg('Description must be at least 10 characters.');
@@ -46,28 +47,19 @@ const CreateTicket = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8080/api/tickets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: user.id,
-          category: formData.category,
-          description: formData.description.trim(),
-          priority: formData.priority,
-          locationOrResource: formData.locationOrResource,
-          preferredContactDetails: formData.preferredContactDetails,
-        }),
+      await ticketService.createTicket({
+        userId: user.id,
+        category: formData.category,
+        description: formData.description.trim(),
+        priority: formData.priority,
+        locationOrResource: formData.locationOrResource,
+        preferredContactDetails: formData.preferredContactDetails,
       });
 
-      if (response.ok) {
-        setSuccessMsg('Ticket submitted successfully! Redirecting...');
-        setTimeout(() => navigate('/tickets/my'), 1500);
-      } else {
-        const data = await response.json();
-        setErrorMsg(data.error || 'Failed to submit ticket. Please try again.');
-      }
+      setSuccessMsg('✅ Ticket submitted successfully! Redirecting...');
+      setTimeout(() => navigate('/tickets/my'), 2000);
     } catch (err) {
-      setErrorMsg('Server error. Please make sure the backend is running.');
+      setErrorMsg(err.message || 'Server error. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -78,23 +70,32 @@ const CreateTicket = () => {
   return (
     <div className="ticket-page-container">
       <nav className="ticket-nav">
-        <div className="nav-logo">Smart Campus Hub</div>
+        <div className="nav-logo">SLIIT Smart Campus</div>
         <div className="nav-links">
           <button className="nav-link-btn" onClick={() => navigate('/dashboard')}>Dashboard</button>
           <button className="nav-link-btn" onClick={() => navigate('/tickets/my')}>My Tickets</button>
-          <button className="logout-btn" onClick={() => { localStorage.removeItem('user'); navigate('/login'); }}>Logout</button>
+          <button className="logout-btn" onClick={() => { localStorage.removeItem('user'); navigate('/login'); }}>
+            <LogOut size={16} style={{marginRight: '5px'}}/> Logout
+          </button>
         </div>
       </nav>
 
       <main className="ticket-main">
+        <button className="cancel-btn" onClick={() => navigate('/tickets/my')} style={{marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '5px'}}>
+          <ChevronLeft size={18}/> Back
+        </button>
+
         <div className="ticket-form-card">
           <div className="form-header">
+            <div style={{background: 'var(--primary-orange-light)', width: '60px', height: '60px', borderRadius: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', color: 'var(--primary-orange)'}}>
+              <Wrench size={32} />
+            </div>
             <h1>Submit a Ticket</h1>
             <p>Report an issue or maintenance request on campus</p>
           </div>
 
           {successMsg && <div className="alert-success">{successMsg}</div>}
-          {errorMsg && <div className="alert-error">{errorMsg}</div>}
+          {errorMsg && <div className="alert-error"><AlertCircle size={18} style={{marginRight: '8px'}}/> {errorMsg}</div>}
 
           <form onSubmit={handleSubmit} className="ticket-form">
             <div className="form-group">
@@ -125,39 +126,44 @@ const CreateTicket = () => {
               <textarea
                 id="description"
                 name="description"
-                rows="5"
-                placeholder="Describe the issue in detail (at least 10 characters)..."
+                rows="4"
+                placeholder="Describe the issue in detail..."
                 value={formData.description}
                 onChange={handleChange}
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="locationOrResource">Location / Resource <span className="optional">(optional)</span></label>
+              <label htmlFor="locationOrResource">
+                <MapPin size={16} style={{verticalAlign: 'middle', marginRight: '5px'}}/> 
+                Location / Resource <span className="optional">(optional)</span>
+              </label>
               <input
                 type="text"
                 id="locationOrResource"
                 name="locationOrResource"
-                placeholder="e.g. Room 201, Lab 3, Block B"
+                placeholder="e.g. Room 201, Lab 3"
                 value={formData.locationOrResource}
                 onChange={handleChange}
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="preferredContactDetails">Preferred Contact <span className="optional">(optional)</span></label>
+              <label htmlFor="preferredContactDetails">
+                <Phone size={16} style={{verticalAlign: 'middle', marginRight: '5px'}}/> 
+                Preferred Contact <span className="optional">(optional)</span>
+              </label>
               <input
                 type="text"
                 id="preferredContactDetails"
                 name="preferredContactDetails"
-                placeholder="e.g. 0771234567 or your email"
+                placeholder="How should we reach you?"
                 value={formData.preferredContactDetails}
                 onChange={handleChange}
               />
             </div>
 
             <div className="form-actions">
-              <button type="button" className="cancel-btn" onClick={() => navigate('/tickets/my')}>Cancel</button>
               <button type="submit" className="submit-btn" disabled={loading}>
                 {loading ? 'Submitting...' : 'Submit Ticket'}
               </button>

@@ -130,9 +130,21 @@
   font-weight: 600;
 }
 
-.empty-state {
-  color: #94a3b8 !important;
-  font-style: italic;
+.browse-btn {
+  background: var(--gradient-orange);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(243, 112, 33, 0.2);
+}
+
+.browse-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(243, 112, 33, 0.35);
 }
 
 .dashboard-loading {

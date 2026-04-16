@@ -56,6 +56,25 @@ const UserDashboard = () => {
           </div>
 
           <div className="widget-card premium-glass">
+            <h3>Maintenance & Incident</h3>
+            <p>Report issues or request maintenance services on campus.</p>
+            <button 
+              className="browse-btn"
+              style={{marginTop: '15px', backgroundColor: '#f97316', width: '100%'}}
+              onClick={() => navigate('/tickets/my')}
+            >
+              My Tickets
+            </button>
+            <button 
+              className="browse-btn"
+              style={{marginTop: '10px', backgroundColor: 'transparent', border: '1px solid #f97316', color: '#f97316', width: '100%'}}
+              onClick={() => navigate('/tickets/create')}
+            >
+              + Submit New Ticket
+            </button>
+          </div>
+
+          <div className="widget-card premium-glass">
             <h3>System Notifications</h3>
             <p className="empty-state">Inbox is empty. Stay tuned!</p>
           </div>
