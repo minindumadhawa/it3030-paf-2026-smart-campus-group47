@@ -20,9 +20,13 @@ const LoginPage = () => {
         body: JSON.stringify({ email, password })
       });
       if (response.ok) {
-        const user = await response.json();
-        localStorage.setItem('user', JSON.stringify(user));
-        navigate('/dashboard');
+        const userData = await response.json();
+        localStorage.setItem('user', JSON.stringify(userData));
+        if (userData.role === 'ADMIN') {
+          navigate('/admin-dashboard');
+        } else {
+          navigate('/dashboard');
+        }
       } else {
         const data = await response.json();
         setErrorMsg(data.error || 'Login failed');

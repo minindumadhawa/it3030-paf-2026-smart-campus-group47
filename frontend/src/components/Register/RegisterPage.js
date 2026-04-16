@@ -11,6 +11,7 @@ const RegisterPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -23,7 +24,8 @@ const RegisterPage = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:8080/api/users/register', {
+      const registerUrl = isAdmin ? 'http://localhost:8080/api/admins/register' : 'http://localhost:8080/api/users/register';
+      const response = await fetch(registerUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -104,6 +106,17 @@ const RegisterPage = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
+            </div>
+
+            <div className="checkbox-group" style={{ marginBottom: '15px', display: 'flex', alignItems: 'center' }}>
+              <input 
+                type="checkbox" 
+                id="isAdminCheckbox" 
+                checked={isAdmin} 
+                onChange={(e) => setIsAdmin(e.target.checked)} 
+                style={{ marginRight: '8px' }}
+              />
+              <label htmlFor="isAdminCheckbox" style={{ fontSize: '14px', color: '#475569', cursor: 'pointer' }}>Register as Administrator</label>
             </div>
 
             <button type="submit" className="primary-register-btn">

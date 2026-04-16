@@ -4,6 +4,7 @@ import Home from "./components/Home/Home";
 import LoginPage from "./components/Login/LoginPage";
 import RegisterPage from "./components/Register/RegisterPage";
 import UserDashboard from "./components/Dashboard/UserDashboard";
+import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 
 function App(){
   return (
@@ -14,6 +15,7 @@ function App(){
           <Route path="/login" element={<LoginPage></LoginPage>}/>
           <Route path="/register" element={<RegisterPage></RegisterPage>}/>
           <Route path="/dashboard" element={<UserDashboard></UserDashboard>}/>
+          <Route path="/admin-dashboard" element={<AdminDashboard></AdminDashboard>}/>
         </Routes>
       </React.Fragment>
     </div>
