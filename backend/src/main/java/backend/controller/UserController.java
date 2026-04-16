@@ -1,12 +1,16 @@
 package backend.controller;
 
 import backend.exception.UserAlreadyExistsException;
+import backend.model.LoginRequest;
 import backend.model.User;
 import backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -26,5 +30,24 @@ public class UserController {
         
         User savedUser = userRepository.save(user);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
+        Optional<User> userOptional = userRepository.findByEmail(loginRequest.getEmail());
+        
+        Map<String, String> errorResponse = new HashMap<>();
+        
+        if (userOptional.isPresent()) {
+            User existingUser = userOptional.get();
+            if (existingUser.getPassword().equals(loginRequest.getPassword())) {
+                return new ResponseEntity<>(existingUser, HttpStatus.OK);
+            } else {
+                errorResponse.put("error", "Invalid password");
+                return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+            }
+        }
+        errorResponse.put("error", "User not found");
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 }

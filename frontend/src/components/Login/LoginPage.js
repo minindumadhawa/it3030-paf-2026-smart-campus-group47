@@ -8,11 +8,28 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
-  const handleEmailLogin = (e) => {
+  const handleEmailLogin = async (e) => {
     e.preventDefault();
-    console.log('Initiating Email Login Flow for:', email);
-    // Placeholder function for standard credentials login
+    setErrorMsg('');
+    try {
+      const response = await fetch('http://localhost:8080/api/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      if (response.ok) {
+        const user = await response.json();
+        localStorage.setItem('user', JSON.stringify(user));
+        navigate('/dashboard');
+      } else {
+        const data = await response.json();
+        setErrorMsg(data.error || 'Login failed');
+      }
+    } catch(err) {
+      setErrorMsg('Network error. Please try again.');
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -31,6 +48,7 @@ const LoginPage = () => {
         </div>
 
         <div className="login-body">
+          {errorMsg && <div className="error-message" style={{ backgroundColor: '#fef2f2', color: '#dc2626', padding: '10px', borderRadius: '6px', fontSize: '14px', marginBottom: '15px', textAlign: 'center' }}>{errorMsg}</div>}
           <form className="login-form" onSubmit={handleEmailLogin}>
             <div className="input-group">
               <div className="input-icon">
