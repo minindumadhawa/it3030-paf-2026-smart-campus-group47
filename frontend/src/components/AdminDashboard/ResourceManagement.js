@@ -11,6 +11,11 @@ const ResourceManagement = () => {
   const [editId, setEditId] = useState(null);
   const [notification, setNotification] = useState('');
 
+  // Filtering states
+  const [filterType, setFilterType] = useState('ALL');
+  const [filterLocation, setFilterLocation] = useState('');
+  const [filterMinCapacity, setFilterMinCapacity] = useState('');
+
   useEffect(() => {
     fetchResources();
   }, []);
@@ -74,6 +79,21 @@ const ResourceManagement = () => {
     }
   };
 
+  // Filter Computation
+  const filteredResources = resources.filter(res => {
+    let matchType = filterType === 'ALL' || res.type === filterType;
+    let matchLocation = filterLocation.trim() === '' || (res.location && res.location.toLowerCase().includes(filterLocation.toLowerCase()));
+    
+    let matchCapacity = true;
+    if (filterMinCapacity !== '') {
+      const minCap = parseInt(filterMinCapacity, 10);
+      const resCap = res.capacity ? parseInt(res.capacity, 10) : 0;
+      matchCapacity = resCap >= minCap;
+    }
+
+    return matchType && matchLocation && matchCapacity;
+  });
+
   return (
     <div className="rm-container">
       <nav className="rm-nav">
@@ -135,7 +155,50 @@ const ResourceManagement = () => {
           </div>
 
           <div className="rm-table-card premium-glass-admin">
-            <h3>Current Catalogue</h3>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '15px', gap: '15px' }}>
+              <h3 style={{ margin: 0, borderBottom: 'none', paddingBottom: 0 }}>Current Catalogue</h3>
+              
+              <div className="filters-container" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <select 
+                  value={filterType} 
+                  onChange={(e) => setFilterType(e.target.value)}
+                  style={{ background: 'rgba(15, 23, 42, 0.6)', color: 'white', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '8px 12px', borderRadius: '6px', fontSize: '13px' }}
+                >
+                  <option value="ALL">All Types</option>
+                  <option value="LECTURE_HALL">Lecture Hall</option>
+                  <option value="LAB">Lab</option>
+                  <option value="MEETING_ROOM">Meeting Room</option>
+                  <option value="EQUIPMENT">Equipment</option>
+                </select>
+                
+                <input 
+                  type="text" 
+                  placeholder="Search Location..." 
+                  value={filterLocation}
+                  onChange={(e) => setFilterLocation(e.target.value)}
+                  style={{ background: 'rgba(15, 23, 42, 0.6)', color: 'white', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '8px 12px', borderRadius: '6px', fontSize: '13px' }}
+                />
+                
+                <input 
+                  type="number" 
+                  placeholder="Min Capacity" 
+                  value={filterMinCapacity}
+                  onChange={(e) => setFilterMinCapacity(e.target.value)}
+                  style={{ background: 'rgba(15, 23, 42, 0.6)', color: 'white', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '8px 12px', borderRadius: '6px', width: '110px', fontSize: '13px' }}
+                  min="0"
+                />
+                
+                <button 
+                  onClick={() => { setFilterType('ALL'); setFilterLocation(''); setFilterMinCapacity(''); }}
+                  style={{ background: 'rgba(255, 255, 255, 0.1)', color: 'white', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', transition: 'background 0.2s' }}
+                  onMouseOver={(e) => e.target.style.background = 'rgba(244, 63, 94, 0.2)'}
+                  onMouseOut={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.1)'}
+                >
+                  Clear Filters
+                </button>
+              </div>
+            </div>
+            
             <div className="table-responsive">
               <table className="rm-table">
                 <thead>
@@ -149,10 +212,10 @@ const ResourceManagement = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {resources.length === 0 ? (
-                    <tr><td colSpan="6" className="empty-state">No resources found</td></tr>
+                  {filteredResources.length === 0 ? (
+                    <tr><td colSpan="6" className="empty-state">No matching resources found.</td></tr>
                   ) : (
-                    resources.map(res => (
+                    filteredResources.map(res => (
                       <tr key={res.id}>
                         <td>{res.name}</td>
                         <td>{res.type.replace('_', ' ')}</td>
