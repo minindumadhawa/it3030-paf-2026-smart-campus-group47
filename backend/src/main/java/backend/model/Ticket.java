@@ -11,15 +11,12 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String title;
-
-    @Column(nullable = false, length = 1000)
-    private String description;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TicketCategory category;
+
+    @Column(nullable = false, length = 2000)
+    private String description;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -29,35 +26,52 @@ public class Ticket {
     @Column(nullable = false)
     private TicketStatus status = TicketStatus.OPEN;
 
-    @Column(nullable = false)
-    private Long userId;
+    @Column
+    private String locationOrResource;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column
+    private String preferredContactDetails;
+
+    @Column
+    private String rejectionReason;
+
+    @Column(length = 2000)
+    private String resolutionNotes;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column
+    private LocalDateTime updatedAt;
+
+    // Many tickets belong to one user
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
     public Ticket() {}
 
-    public Ticket(String title, String description, TicketCategory category, TicketPriority priority, Long userId) {
-        this.title = title;
-        this.description = description;
-        this.category = category;
-        this.priority = priority;
-        this.userId = userId;
-        this.status = TicketStatus.OPEN;
-        this.createdAt = LocalDateTime.now();
-    }
+    // Getters and Setters
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    public TicketCategory getCategory() { return category; }
+    public void setCategory(TicketCategory category) { this.category = category; }
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
-
-    public TicketCategory getCategory() { return category; }
-    public void setCategory(TicketCategory category) { this.category = category; }
 
     public TicketPriority getPriority() { return priority; }
     public void setPriority(TicketPriority priority) { this.priority = priority; }
@@ -65,9 +79,24 @@ public class Ticket {
     public TicketStatus getStatus() { return status; }
     public void setStatus(TicketStatus status) { this.status = status; }
 
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
+    public String getLocationOrResource() { return locationOrResource; }
+    public void setLocationOrResource(String locationOrResource) { this.locationOrResource = locationOrResource; }
+
+    public String getPreferredContactDetails() { return preferredContactDetails; }
+    public void setPreferredContactDetails(String preferredContactDetails) { this.preferredContactDetails = preferredContactDetails; }
+
+    public String getRejectionReason() { return rejectionReason; }
+    public void setRejectionReason(String rejectionReason) { this.rejectionReason = rejectionReason; }
+
+    public String getResolutionNotes() { return resolutionNotes; }
+    public void setResolutionNotes(String resolutionNotes) { this.resolutionNotes = resolutionNotes; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }
