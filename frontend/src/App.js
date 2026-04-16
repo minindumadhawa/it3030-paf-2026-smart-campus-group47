@@ -5,6 +5,7 @@ import LoginPage from "./components/Login/LoginPage";
 import RegisterPage from "./components/Register/RegisterPage";
 import UserDashboard from "./components/Dashboard/UserDashboard";
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
+import ResourceManagement from "./components/AdminDashboard/ResourceManagement";
 
 function App(){
   return (
@@ -16,6 +17,7 @@ function App(){
           <Route path="/register" element={<RegisterPage></RegisterPage>}/>
           <Route path="/dashboard" element={<UserDashboard></UserDashboard>}/>
           <Route path="/admin-dashboard" element={<AdminDashboard></AdminDashboard>}/>
+          <Route path="/admin/resources" element={<ResourceManagement></ResourceManagement>}/>
         </Routes>
       </React.Fragment>
     </div>

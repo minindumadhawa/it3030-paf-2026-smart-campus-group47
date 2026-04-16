@@ -38,6 +38,12 @@ const AdminDashboard = () => {
         <header className="admin-dashboard-header">
           <h1>Admin Portal: Welcome, {admin.fullName}! 🛡️</h1>
           <p>System Management and Global Campus Settings.</p>
+          <button 
+            style={{marginTop: '20px', backgroundColor: '#38bdf8', color: '#0f172a', border: 'none', padding: '12px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold'}}
+            onClick={() => navigate('/admin/resources')}
+          >
+            Manage Facilities & Resources Catalogue
+          </button>
         </header>
 
         <section className="admin-dashboard-widgets">
