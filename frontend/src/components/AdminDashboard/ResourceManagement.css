@@ -1,0 +1,228 @@
+.rm-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  font-family: 'Inter', sans-serif;
+  color: white;
+}
+
+.rm-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 50px;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.rm-nav .nav-logo {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.rm-nav .nav-logo span {
+  color: #38bdf8;
+  font-weight: 400;
+}
+
+.back-btn {
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 8px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.rm-main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.rm-header {
+  margin-bottom: 30px;
+}
+
+.rm-header h1 {
+  font-size: 32px;
+  color: #f8fafc;
+  margin-bottom: 10px;
+  font-weight: 800;
+}
+
+.rm-header p {
+  color: #94a3b8;
+}
+
+.rm-notification {
+  background-color: rgba(52, 211, 153, 0.1);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 600;
+  animation: fadeInDown 0.3s ease-out;
+}
+
+.rm-content-grid {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 30px;
+}
+
+@media (max-width: 900px) {
+  .rm-content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rm-form-card, .rm-table-card {
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.rm-form-card h3, .rm-table-card h3 {
+  margin-top: 0;
+  font-size: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+  color: #f1f5f9;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  color: #cbd5e1;
+  font-size: 14px;
+}
+
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(15, 23, 42, 0.6);
+  color: white;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.form-group input:focus, .form-group select:focus {
+  outline: none;
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.save-btn {
+  flex: 1;
+  background-color: #0284c7;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.save-btn:hover { background-color: #0369a1; }
+
+.cancel-btn {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: none;
+  padding: 12px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.cancel-btn:hover { background-color: rgba(255, 255, 255, 0.2); }
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.rm-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rm-table th, .rm-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.rm-table th {
+  color: #94a3b8;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.rm-table td {
+  color: #f1f5f9;
+  font-size: 14px;
+}
+
+.status-pill {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.active-pill {
+  background-color: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+}
+
+.out-pill {
+  background-color: rgba(244, 63, 94, 0.15);
+  color: #fb7185;
+}
+
+.actions-cell {
+  white-space: nowrap;
+}
+
+.actions-cell button {
+  padding: 5px 10px;
+  border-radius: 4px;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-right: 5px;
+}
+
+.edit-btn { background-color: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+.edit-btn:hover { background-color: rgba(56, 189, 248, 0.3); }
+
+.delete-btn { background-color: rgba(244, 63, 94, 0.2); color: #fb7185; }
+.delete-btn:hover { background-color: rgba(244, 63, 94, 0.3); }
