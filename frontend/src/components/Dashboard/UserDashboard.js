@@ -33,6 +33,13 @@ const UserDashboard = () => {
         <header className="dashboard-header">
           <h1>Welcome back, {user.fullName}! 👋</h1>
           <p>Access all your standard Smart Campus operations right here.</p>
+          <button 
+            className="browse-btn"
+            style={{marginTop: '20px', backgroundColor: '#f97316', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold'}}
+            onClick={() => navigate('/user/resources')}
+          >
+            Browse Available Resources
+          </button>
         </header>
 
         <section className="dashboard-widgets">
