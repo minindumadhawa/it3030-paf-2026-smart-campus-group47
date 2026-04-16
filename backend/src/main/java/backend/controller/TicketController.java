@@ -1,17 +1,17 @@
 package backend.controller;
 
+import backend.dto.TicketRequest;
+import backend.dto.TicketResponse;
 import backend.exception.TicketNotFoundException;
-import backend.model.Ticket;
-import backend.model.TicketStatus;
-import backend.repository.TicketRepository;
+import backend.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/tickets")
@@ -19,53 +19,55 @@ import java.util.Optional;
 public class TicketController {
 
     @Autowired
-    private TicketRepository ticketRepository;
+    private TicketService ticketService;
 
-    // Create a new ticket (Student submits a ticket)
+    // POST /api/tickets
+    // Create a new ticket (logged-in user)
     @PostMapping
-    public ResponseEntity<Ticket> createTicket(@RequestBody Ticket ticket) {
-        Ticket savedTicket = ticketRepository.save(ticket);
-        return new ResponseEntity<>(savedTicket, HttpStatus.CREATED);
-    }
-
-    // Get all tickets submitted by a specific user (Student view)
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Ticket>> getTicketsByUser(@PathVariable Long userId) {
-        List<Ticket> tickets = ticketRepository.findByUserId(userId);
-        return new ResponseEntity<>(tickets, HttpStatus.OK);
-    }
-
-    // Get all tickets (Admin view)
-    @GetMapping
-    public ResponseEntity<List<Ticket>> getAllTickets() {
-        List<Ticket> tickets = ticketRepository.findAll();
-        return new ResponseEntity<>(tickets, HttpStatus.OK);
-    }
-
-    // Update ticket status (Admin updates the status)
-    @PutMapping("/{id}/status")
-    public ResponseEntity<?> updateTicketStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
-        Optional<Ticket> optionalTicket = ticketRepository.findById(id);
-
-        if (optionalTicket.isEmpty()) {
-            throw new TicketNotFoundException("Ticket with id " + id + " not found.");
+    public ResponseEntity<?> createTicket(@RequestBody TicketRequest request) {
+        try {
+            TicketResponse response = ticketService.createTicket(request);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
         }
-
-        Ticket ticket = optionalTicket.get();
-        TicketStatus newStatus = TicketStatus.valueOf(body.get("status"));
-        ticket.setStatus(newStatus);
-        ticketRepository.save(ticket);
-
-        return new ResponseEntity<>(ticket, HttpStatus.OK);
     }
 
-    // Delete a ticket (Optional - Student or Admin can delete)
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTicket(@PathVariable Long id) {
-        if (!ticketRepository.existsById(id)) {
-            throw new TicketNotFoundException("Ticket with id " + id + " not found.");
+    // GET /api/tickets/my?userId=1
+    // Get all tickets submitted by the logged-in user
+    @GetMapping("/my")
+    public ResponseEntity<?> getMyTickets(@RequestParam Long userId) {
+        try {
+            List<TicketResponse> tickets = ticketService.getMyTickets(userId);
+            return new ResponseEntity<>(tickets, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
         }
-        ticketRepository.deleteById(id);
-        return new ResponseEntity<>("Ticket deleted successfully.", HttpStatus.OK);
+    }
+
+    // GET /api/tickets/{id}?userId=1&role=USER
+    // Get a single ticket by ID
+    // Users can only view their own; Admin can view any
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getTicketById(
+            @PathVariable Long id,
+            @RequestParam Long userId,
+            @RequestParam String role) {
+        try {
+            TicketResponse response = ticketService.getTicketById(id, userId, role);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (TicketNotFoundException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+        }
     }
 }
