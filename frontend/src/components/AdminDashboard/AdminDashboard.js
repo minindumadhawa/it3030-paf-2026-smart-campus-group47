@@ -59,6 +59,16 @@ const AdminDashboard = () => {
             <p className="empty-state">No anomalous user activities detected.</p>
           </div>
 
+          <div className="admin-widget-card premium-glass-admin" 
+               style={{border: '1px solid rgba(56, 189, 248, 0.3)', cursor: 'pointer'}}
+               onClick={() => navigate('/admin/tickets')}>
+            <h3 style={{color: '#38bdf8'}}>Maintenance & Incidents</h3>
+            <p><strong>Pending Actions:</strong> Manage student reports and campus maintenance logs.</p>
+            <span className="status-badge" style={{background: 'rgba(56, 189, 248, 0.2)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.3)'}}>
+              Open Records Portal →
+            </span>
+          </div>
+
           <div className="admin-widget-card premium-glass-admin">
             <h3>Administrator Details</h3>
             <p><strong>Name:</strong> {admin.fullName}</p>

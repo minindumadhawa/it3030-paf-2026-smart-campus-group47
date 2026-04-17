@@ -27,6 +27,12 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.getMyTickets(userId));
     }
 
+    @GetMapping
+    public ResponseEntity<List<TicketResponse>> getAllTickets(@RequestParam String role) {
+        return ResponseEntity.ok(ticketService.getAllTickets(role));
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<TicketResponse> getTicketById(
             @PathVariable Long id,

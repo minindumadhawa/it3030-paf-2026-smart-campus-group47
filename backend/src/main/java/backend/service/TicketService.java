@@ -57,6 +57,15 @@ public class TicketService {
                 .collect(Collectors.toList());
     }
 
+    public List<TicketResponse> getAllTickets(String role) {
+        if (!"ADMIN".equalsIgnoreCase(role)) {
+            throw new UnauthorizedException("Access denied. Only Admins can view all tickets.");
+        }
+        return ticketRepository.findAll().stream()
+                .map(TicketResponse::fromEntity)
+                .collect(Collectors.toList());
+    }
+
     public TicketResponse getTicketById(Long ticketId, Long requestingUserId, String role) {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new TicketNotFoundException("Ticket not found with id: " + ticketId));
