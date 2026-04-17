@@ -7,6 +7,10 @@ import UserDashboard from "./components/Dashboard/UserDashboard";
 import UserResourceView from "./components/Dashboard/UserResourceView";
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 import ResourceManagement from "./components/AdminDashboard/ResourceManagement";
+import CreateTicket from "./components/Tickets/CreateTicket";
+import MyTickets from "./components/Tickets/MyTickets";
+import TicketDetails from "./components/Tickets/TicketDetails";
+import TicketManagement from "./components/Tickets/TicketManagement";
 
 function App(){
   return (
@@ -20,6 +24,11 @@ function App(){
           <Route path="/user/resources" element={<UserResourceView></UserResourceView>}/>
           <Route path="/admin-dashboard" element={<AdminDashboard></AdminDashboard>}/>
           <Route path="/admin/resources" element={<ResourceManagement></ResourceManagement>}/>
+          {/* Module C - Maintenance & Incident Ticketing */}
+          <Route path="/tickets/create" element={<CreateTicket></CreateTicket>}/>
+          <Route path="/tickets/my" element={<MyTickets></MyTickets>}/>
+          <Route path="/tickets/:id" element={<TicketDetails></TicketDetails>}/>
+          <Route path="/admin/tickets" element={<TicketManagement></TicketManagement>}/>
         </Routes>
       </React.Fragment>
     </div>
