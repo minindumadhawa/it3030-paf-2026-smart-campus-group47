@@ -2,9 +2,11 @@ import React from 'react';
 import './Home.css';
 import { Building2, Wrench, Calendar, Bell, ChevronRight, UserCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import NotificationBell from '../Notification/NotificationBell';
 
 const Home = () => {
   const navigate = useNavigate();
+  const userId = localStorage.getItem('userId') || null;
   return (
     <div className="home-container">
       {/* Navigation Bar */}
@@ -23,6 +25,7 @@ const Home = () => {
             <UserCircle size={20} />
             <span>Login</span>
           </button>
+          <NotificationBell userId={userId} />
         </div>
       </nav>
 
