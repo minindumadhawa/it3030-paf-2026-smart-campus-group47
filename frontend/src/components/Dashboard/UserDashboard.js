@@ -28,14 +28,14 @@ const UserDashboard = () => {
         <div className="nav-logo">Smart Campus Hub</div>
         <button className="logout-btn" onClick={handleLogout}>Logout</button>
       </nav>
-      
+
       <main className="dashboard-main">
         <header className="dashboard-header">
           <h1>Welcome back, {user.fullName}! 👋</h1>
           <p>Access all your standard Smart Campus operations right here.</p>
-          <button 
+          <button
             className="browse-btn"
-            style={{marginTop: '20px', backgroundColor: '#f97316', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold'}}
+            style={{ marginTop: '20px', backgroundColor: '#f97316', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
             onClick={() => navigate('/user/resources')}
           >
             Browse Available Resources
@@ -49,7 +49,7 @@ const UserDashboard = () => {
             <p><strong>Email Address:</strong> {user.email}</p>
             <span className="status-badge">Active User</span>
           </div>
-          
+
           <div className="widget-card premium-glass">
             <h3>Upcoming Operations</h3>
             <p className="empty-state">No scheduled operations available.</p>
@@ -58,16 +58,16 @@ const UserDashboard = () => {
           <div className="widget-card premium-glass">
             <h3>Maintenance & Incident</h3>
             <p>Report issues or request maintenance services on campus.</p>
-            <button 
+            <button
               className="browse-btn"
-              style={{marginTop: '15px', backgroundColor: '#f97316', width: '100%'}}
+              style={{ marginTop: '15px', backgroundColor: '#f97316', width: '100%' }}
               onClick={() => navigate('/tickets/my')}
             >
               My Tickets
             </button>
-            <button 
+            <button
               className="browse-btn"
-              style={{marginTop: '10px', backgroundColor: 'transparent', border: '1px solid #f97316', color: '#f97316', width: '100%'}}
+              style={{ marginTop: '10px', backgroundColor: 'transparent', border: '1px solid #f97316', color: '#f97316', width: '100%' }}
               onClick={() => navigate('/tickets/create')}
             >
               + Submit New Ticket

@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { 
   PlusCircle, Clock, CheckCircle, XCircle, 
   AlertCircle, LayoutDashboard, LogOut,
-  ChevronRight, Calendar, User, Info
+  ChevronRight, Calendar, User, Info, Search, Filter
 } from 'lucide-react';
 import ticketService from '../../services/ticketService';
 import './MyTickets.css';
@@ -12,8 +12,15 @@ const MyTickets = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [tickets, setTickets] = useState([]);
+  const [filteredTickets, setFilteredTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
+
+  // Filter States
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [categoryFilter, setCategoryFilter] = useState('ALL');
+  const [priorityFilter, setPriorityFilter] = useState('ALL');
 
   const [stats, setStats] = useState({
     OPEN: 0,
@@ -33,12 +40,39 @@ const MyTickets = () => {
     }
   }, [navigate]);
 
+  useEffect(() => {
+    let result = [...tickets];
+    
+    if (statusFilter !== 'ALL') {
+      result = result.filter(t => t.status === statusFilter);
+    }
+    
+    if (categoryFilter !== 'ALL') {
+      result = result.filter(t => t.category === categoryFilter);
+    }
+
+    if (priorityFilter !== 'ALL') {
+      result = result.filter(t => t.priority === priorityFilter);
+    }
+
+    if (searchTerm) {
+      const lowerSearch = searchTerm.toLowerCase();
+      result = result.filter(t => 
+        t.id.toString().includes(lowerSearch) || 
+        t.description.toLowerCase().includes(lowerSearch)
+      );
+    }
+    
+    setFilteredTickets(result);
+  }, [searchTerm, statusFilter, categoryFilter, priorityFilter, tickets]);
+
   const fetchMyTickets = async (userId) => {
     setLoading(true);
     try {
       const data = await ticketService.getMyTickets(userId);
       const sortedData = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setTickets(sortedData);
+      setFilteredTickets(sortedData);
       
       // Calculate Stats
       const counts = { OPEN: 0, IN_PROGRESS: 0, RESOLVED: 0, REJECTED: 0 };
@@ -89,31 +123,19 @@ const MyTickets = () => {
         <section className="dashboard-stats-grid">
           <div className="stat-card st-open">
             <div className="stat-icon"><Clock size={24} /></div>
-            <div className="stat-info">
-              <h2>{stats.OPEN}</h2>
-              <p>Active Requests</p>
-            </div>
+            <div className="stat-info"><h2>{stats.OPEN}</h2><p>Active Requests</p></div>
           </div>
           <div className="stat-card st-progress">
             <div className="stat-icon"><Info size={24} /></div>
-            <div className="stat-info">
-              <h2>{stats.IN_PROGRESS}</h2>
-              <p>In Progress</p>
-            </div>
+            <div className="stat-info"><h2>{stats.IN_PROGRESS}</h2><p>In Progress</p></div>
           </div>
           <div className="stat-card st-resolved">
             <div className="stat-icon"><CheckCircle size={24} /></div>
-            <div className="stat-info">
-              <h2>{stats.RESOLVED}</h2>
-              <p>Completed</p>
-            </div>
+            <div className="stat-info"><h2>{stats.RESOLVED}</h2><p>Completed</p></div>
           </div>
           <div className="stat-card st-rejected">
             <div className="stat-icon"><XCircle size={24} /></div>
-            <div className="stat-info">
-              <h2>{stats.REJECTED}</h2>
-              <p>Rejected</p>
-            </div>
+            <div className="stat-info"><h2>{stats.REJECTED}</h2><p>Rejected</p></div>
           </div>
         </section>
 
@@ -121,7 +143,47 @@ const MyTickets = () => {
         <section className="activity-section">
           <div className="section-header">
             <h3>Recent Activity</h3>
-            <span className="count-label">{tickets.length} total entries</span>
+            <span className="count-label">{filteredTickets.length} total entries</span>
+          </div>
+
+          {/* Advanced Filter Row (Navy Style - as per photo) */}
+          <div className="advanced-filters-row">
+            <div className="filter-item search">
+              <Search size={16} />
+              <input 
+                type="text" 
+                placeholder="Search by ID or Issue..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="filter-item">
+              <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+                <option value="ALL">All Statuses</option>
+                <option value="OPEN">Open</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="RESOLVED">Resolved</option>
+                <option value="REJECTED">Rejected</option>
+              </select>
+            </div>
+            <div className="filter-item">
+              <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+                <option value="ALL">All Categories</option>
+                <option value="MAINTENANCE">Maintenance</option>
+                <option value="IT_SUPPORT">IT Support</option>
+                <option value="CLEANING">Cleaning</option>
+                <option value="FACILITY">Facility</option>
+              </select>
+            </div>
+            <div className="filter-item">
+              <select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)}>
+                <option value="ALL">All Priorities</option>
+                <option value="URGENT">Urgent</option>
+                <option value="HIGH">High</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="LOW">Low</option>
+              </select>
+            </div>
           </div>
 
           <div className="table-wrapper">
@@ -131,14 +193,12 @@ const MyTickets = () => {
                 <p>Retrieving your logs...</p>
               </div>
             ) : errorMsg ? (
-              <div className="alert-error">
-                <AlertCircle size={20} /> {errorMsg}
-              </div>
-            ) : tickets.length === 0 ? (
+              <div className="alert-error"><AlertCircle size={20} /> {errorMsg}</div>
+            ) : filteredTickets.length === 0 ? (
               <div className="empty-state-base">
                 <LayoutDashboard size={48} />
                 <h3>No Recent Activity</h3>
-                <p>Everything looks clear! If you have a maintenance issue, click 'Submit New Ticket' to get started.</p>
+                <p>No tickets match your search filters.</p>
               </div>
             ) : (
               <table className="dashboard-table">
@@ -154,7 +214,7 @@ const MyTickets = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {tickets.map(ticket => (
+                  {filteredTickets.map(ticket => (
                     <tr key={ticket.id}>
                       <td className="id-cell">#{ticket.id}</td>
                       <td className="desc-cell">{ticket.description.substring(0, 40)}{ticket.description.length > 40 ? '...' : ''}</td>
