@@ -1,128 +1,351 @@
-.details-main {
-  padding: 3rem 5%;
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.back-link {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--text-muted);
-  text-decoration: none;
-  font-weight: 600;
-  margin-bottom: 2rem;
-  transition: color 0.3s;
-}
-
-.back-link:hover {
-  color: var(--primary-orange);
-}
-
-.details-card {
-  background: var(--card-bg);
-  border-radius: 24px;
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--border-color);
-  overflow: hidden;
-}
-
-.details-header {
-  padding: 3rem;
-  background: var(--gradient-soft);
-  border-bottom: 1px solid var(--border-color);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.ticket-id-label {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.ticket-title-heading {
-  font-size: 2.2rem;
-  color: var(--navy-blue);
-  font-weight: 800;
-}
-
-.details-body {
-  padding: 3rem;
-}
-
-.details-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2.5rem;
-}
-
-.detail-block.full-width {
-  grid-column: span 2;
-}
-
-.detail-label {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 700;
-  margin-bottom: 0.75rem;
-}
-
-.detail-value {
-  font-size: 1.1rem;
-  color: var(--text-main);
-  line-height: 1.6;
-}
-
-.detail-sub {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  margin-top: 0.2rem;
-}
-
-.info-block {
-  margin-top: 2.5rem;
-  padding: 2rem;
-  border-radius: 16px;
-}
-
-.rejected-block {
-  background-color: #fef2f2;
-  border: 1px solid #fca5a5;
-}
-
-.resolved-block {
-  background-color: #ecfdf5;
-  border: 1px solid #6ee7b7;
-}
-
-.status-badge-large {
-  padding: 0.6rem 1.5rem;
-  border-radius: 99px;
-  font-weight: 800;
-  font-size: 1rem;
-  text-transform: uppercase;
-}
-
-.priority-badge-large {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0.5rem 1rem;
-  background: #f1f5f9;
-  border-radius: 10px;
-  font-weight: 700;
-  color: var(--navy-blue);
-}
-@media (max-width: 600px) {
+.ticket-page-container {
+    min-height: 100vh;
+    background-color: #f8fafc;
+    color: #1e293b;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  
+  /* Layout */
+  .details-main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+  
+  .detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 2rem;
+    margin-top: 1.5rem;
+  }
+  
+  @media (max-width: 968px) {
+    .detail-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #64748b;
+    text-decoration: none;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    transition: color 0.2s;
+  }
+  
+  .back-link:hover {
+    color: var(--primary-orange);
+  }
+  
+  /* Main Card */
+  .details-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid #e2e8f0;
+  }
+  
+  .details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 1.5rem;
+  }
+  
+  .ticket-id-label {
+    color: #94a3b8;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+  
+  .ticket-title-heading {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+  }
+  
+  /* Status Badges */
+  .status-badge-large {
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .status-open { background: #eff6ff; color: #1d4ed8; }
+  .status-in-progress { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
+  .status-resolved { background: #f0fdf4; color: #15803d; }
+  .status-rejected { background: #fef2f2; color: #b91c1c; }
+  
+  /* Grid Info */
   .details-grid {
-    grid-template-columns: 1fr;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
   }
-  .detail-block.full-width {
-    grid-column: span 1;
+  
+  .detail-block {
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 12px;
   }
-}
+  
+  .full-width {
+    grid-column: 1 / -1;
+  }
+  
+  .detail-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    margin-bottom: 0.5rem;
+  }
+  
+  .detail-value {
+    font-weight: 600;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .description-text {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: #1e293b;
+    white-space: pre-wrap;
+  }
+  
+  .icon-orange { color: #F37021; }
+  
+  .priority-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: #F37021;
+    font-weight: 700;
+  }
+  
+  /* Blocks for Resolved/Rejected */
+  .info-block {
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    border-radius: 12px;
+  }
+  
+  .rejected-block { background: #fef2f2; border-left: 4px solid #ef4444; }
+  .resolved-block { background: #f0fdf4; border-left: 4px solid #22c55e; }
+  
+  /* Comments Section */
+  .comments-section {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid #e2e8f0;
+  }
+  
+  .comments-list {
+    margin: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .comment-card {
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+  }
+  
+  .comment-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .comment-user {
+    font-weight: 700;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  
+  .comment-content {
+    font-size: 0.95rem;
+    color: #1e293b;
+    line-height: 1.5;
+  }
+  
+  .comment-actions {
+    margin-top: 0.5rem;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .delete-comment-btn {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  
+  .delete-comment-btn:hover { color: #ef4444; }
+  
+  .comment-form {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+  
+  .comment-form textarea {
+    flex: 1;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    resize: none;
+    height: 45px;
+    font-family: inherit;
+  }
+  
+  .comment-form button {
+    background: #F37021;
+    color: white;
+    border: none;
+    padding: 0 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  /* Admin Sidebar */
+  .admin-card {
+    position: sticky;
+    top: 2rem;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  .admin-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    color: #0f172a;
+  }
+  
+  .admin-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  
+  .admin-section label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: #475569;
+  }
+  
+  .admin-form-group {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .admin-form-group input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+  }
+  
+  .admin-form-group button {
+    background: #0f172a;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  
+  .status-buttons {
+    display: grid;
+    gap: 0.5rem;
+  }
+  
+  .status-buttons button {
+    padding: 0.6rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  
+  .btn-in-progress { background: #fff7ed; color: #c2410c; }
+  .btn-resolved { background: #f0fdf4; color: #15803d; }
+  .btn-rejected { background: #fef2f2; color: #b91c1c; }
+  
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .modal-field textarea {
+    width: 100%;
+    height: 100px;
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+  }
+  
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .modal-cancel-btn { background: #f1f5f9; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; }
+  .modal-submit-btn { background: #F37021; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; }

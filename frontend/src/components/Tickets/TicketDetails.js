@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { ChevronLeft, Calendar, User, Mail, MapPin, Phone, CheckCircle, XCircle, Clock, AlertCircle, LogOut } from 'lucide-react';
+import { 
+  ChevronLeft, Calendar, User, Mail, MapPin, Phone, 
+  CheckCircle, XCircle, Clock, AlertCircle, LogOut,
+  Send, Trash2, Shield
+} from 'lucide-react';
 import ticketService from '../../services/ticketService';
+import commentService from '../../services/commentService';
 import './TicketDetails.css';
 
 const statusIcons = {
@@ -17,29 +22,106 @@ const TicketDetails = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [ticket, setTicket] = useState(null);
+  const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
+  
+  // Admin Action States
+  const [staffName, setStaffName] = useState('');
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [resolutionNotes, setResolutionNotes] = useState('');
+  const [adminActionLoading, setAdminActionLoading] = useState(false);
+
+  // Comment States
+  const [newComment, setNewComment] = useState('');
+  const [commentLoading, setCommentLoading] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
-      fetchTicket(id, parsedUser.id, parsedUser.role);
+      fetchTicketData(id, parsedUser.id, parsedUser.role);
     } else {
       navigate('/login');
     }
   }, [id, navigate]);
 
-  const fetchTicket = async (ticketId, userId, role) => {
+  const fetchTicketData = async (ticketId, userId, role) => {
     setLoading(true);
     try {
-      const data = await ticketService.getTicketById(ticketId, userId, role);
-      setTicket(data);
+      const ticketData = await ticketService.getTicketById(ticketId, userId, role);
+      setTicket(ticketData);
+      setStaffName(ticketData.assignedStaffName || '');
+      
+      const commentData = await commentService.getCommentsByTicket(ticketId);
+      setComments(commentData);
     } catch (err) {
-      setErrorMsg(err.message || 'Failed to load ticket details.');
+      setErrorMsg(err.message || 'Failed to load details.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAssign = async (e) => {
+    e.preventDefault();
+    setAdminActionLoading(true);
+    try {
+      await ticketService.assignStaff(id, user.id, user.role, staffName);
+      alert('Staff assigned successfully!');
+      fetchTicketData(id, user.id, user.role);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setAdminActionLoading(false);
+    }
+  };
+
+  const handleUpdateStatus = async () => {
+    setAdminActionLoading(true);
+    try {
+      await ticketService.updateStatus(id, user.id, user.role, selectedStatus, rejectionReason);
+      
+      if (selectedStatus === 'RESOLVED' && resolutionNotes) {
+        await ticketService.updateResolution(id, user.id, user.role, resolutionNotes);
+      }
+      
+      alert('Status updated successfully!');
+      setShowStatusModal(false);
+      fetchTicketData(id, user.id, user.role);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setAdminActionLoading(false);
+    }
+  };
+
+  const handlePostComment = async (e) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+    
+    setCommentLoading(true);
+    try {
+      await commentService.addComment(id, user.id, user.role, newComment);
+      setNewComment('');
+      const commentData = await commentService.getCommentsByTicket(id);
+      setComments(commentData);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setCommentLoading(false);
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    if (!window.confirm('Delete this comment?')) return;
+    try {
+      await commentService.deleteComment(commentId, user.id, user.role);
+      setComments(comments.filter(c => c.id !== commentId));
+    } catch (err) {
+      alert(err.message);
     }
   };
 
@@ -76,100 +158,210 @@ const TicketDetails = () => {
         ) : errorMsg ? (
           <div className="alert-error">{errorMsg}</div>
         ) : (
-          <div className="details-card">
-            <div className="details-header">
-              <div>
-                <p className="ticket-id-label">Ticket ID: #{ticket.id}</p>
-                <h1 className="ticket-title-heading">{ticket.category.replace('_', ' ')}</h1>
-              </div>
-              <span className={`status-badge-large status-${ticket.status.toLowerCase().replace('_', '-')}`} style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                {statusIcons[ticket.status]} {ticket.status.replace('_', ' ')}
-              </span>
-            </div>
-
-            <div className="details-body">
-              <div className="details-grid">
-                {/* Description */}
-                <div className="detail-block full-width">
-                  <p className="detail-label">Issue Description</p>
-                  <p className="detail-value" style={{fontSize: '1.2rem', whiteSpace: 'pre-line'}}>{ticket.description}</p>
-                </div>
-
-                {/* Priority */}
-                <div className="detail-block">
-                  <p className="detail-label">Priority Level</p>
-                  <span className="priority-badge-large">
-                    <AlertCircle size={18} style={{color: 'var(--primary-orange)'}}/> {ticket.priority}
+          <div className="detail-layout">
+            <div className="detail-left-col">
+              {/* Ticket Main Info */}
+              <div className="details-card">
+                <div className="details-header">
+                  <div>
+                    <p className="ticket-id-label">Ticket ID: #{ticket.id}</p>
+                    <h1 className="ticket-title-heading">{ticket.category.replace('_', ' ')}</h1>
+                  </div>
+                  <span className={`status-badge-large status-${ticket.status.toLowerCase().replace('_', '-')}`}>
+                    {statusIcons[ticket.status]} {ticket.status.replace('_', ' ')}
                   </span>
                 </div>
 
-                {/* Location */}
-                <div className="detail-block">
-                  <p className="detail-label">Location / Resource</p>
-                  <p className="detail-value">
-                    <MapPin size={18} style={{marginRight: '8px', verticalAlign: 'middle', color: 'var(--primary-orange)'}}/>
-                    {ticket.locationOrResource || 'Not specified'}
-                  </p>
-                </div>
+                <div className="details-body">
+                  <div className="detail-block full-width">
+                    <p className="detail-label">Issue Description</p>
+                    <p className="detail-value description-text">{ticket.description}</p>
+                  </div>
 
-                {/* Submitted By */}
-                <div className="detail-block">
-                  <p className="detail-label">Submitted By</p>
-                  <p className="detail-value">
-                    <User size={18} style={{marginRight: '8px', verticalAlign: 'middle'}}/>
-                    {ticket.userFullName}
-                  </p>
-                  <p className="detail-sub">
-                    <Mail size={14} style={{marginRight: '8px', verticalAlign: 'middle'}}/>
-                    {ticket.userEmail}
-                  </p>
-                </div>
+                  <div className="details-grid">
+                    <div className="detail-block">
+                      <p className="detail-label">Priority Level</p>
+                      <span className={`priority-pill ${ticket.priority.toLowerCase()}`}>
+                        <AlertCircle size={16} /> {ticket.priority}
+                      </span>
+                    </div>
 
-                {/* Contact */}
-                <div className="detail-block">
-                  <p className="detail-label">Preferred Contact</p>
-                  <p className="detail-value">
-                    <Phone size={18} style={{marginRight: '8px', verticalAlign: 'middle'}}/>
-                    {ticket.preferredContactDetails || 'Default (Email)'}
-                  </p>
-                </div>
+                    <div className="detail-block">
+                      <p className="detail-label">Location / Resource</p>
+                      <p className="detail-value">
+                        <MapPin size={18} className="icon-orange"/> {ticket.locationOrResource || 'Not specified'}
+                      </p>
+                    </div>
 
-                {/* Timestamps */}
-                <div className="detail-block">
-                  <p className="detail-label">Created On</p>
-                  <p className="detail-value">
-                    <Calendar size={18} style={{marginRight: '8px', verticalAlign: 'middle'}}/>
-                    {formatDate(ticket.createdAt)}
-                  </p>
-                </div>
+                    <div className="detail-block">
+                      <p className="detail-label">Assigned Staff</p>
+                      <p className="detail-value">
+                        <Shield size={18} className="icon-orange"/> {ticket.assignedStaffName || 'Unassigned'}
+                      </p>
+                    </div>
 
-                <div className="detail-block">
-                  <p className="detail-label">Last Updated</p>
-                  <p className="detail-value">
-                    <Clock size={18} style={{marginRight: '8px', verticalAlign: 'middle'}}/>
-                    {formatDate(ticket.updatedAt)}
-                  </p>
+                    <div className="detail-block">
+                      <p className="detail-label">Preferred Contact</p>
+                      <p className="detail-value">
+                        <Phone size={18} className="icon-orange"/> {ticket.preferredContactDetails || 'Default'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {ticket.status === 'REJECTED' && (
+                    <div className="info-block rejected-block">
+                      <p className="detail-label">Rejection Reason</p>
+                      <p className="detail-value">{ticket.rejectionReason}</p>
+                    </div>
+                  )}
+
+                  {ticket.status === 'RESOLVED' && (
+                    <div className="info-block resolved-block">
+                      <p className="detail-label">Resolution Notes</p>
+                      <p className="detail-value">{ticket.resolutionNotes}</p>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* Rejection/Resolution Sections */}
-              {ticket.status === 'REJECTED' && (
-                <div className="info-block rejected-block">
-                  <p className="detail-label" style={{color: '#991b1b'}}>Rejection Reason</p>
-                  <p className="detail-value">{ticket.rejectionReason || 'No reason provided.'}</p>
+              {/* Comments Section */}
+              <div className="comments-section">
+                <h3><Clock size={20} /> Discussion & Logs</h3>
+                <div className="comments-list">
+                  {comments.length === 0 ? (
+                    <p className="no-comments">No updates or comments yet.</p>
+                  ) : (
+                    comments.map(comment => (
+                      <div key={comment.id} className="comment-card">
+                        <div className="comment-header">
+                          <span className="comment-user">
+                            <User size={14} /> {comment.userFullName}
+                          </span>
+                          <span className="comment-date">{formatDate(comment.createdAt)}</span>
+                        </div>
+                        <div className="comment-content">{comment.content}</div>
+                        {(user.role === 'ADMIN' || user.id === comment.userId) && (
+                          <div className="comment-actions">
+                            <button onClick={() => handleDeleteComment(comment.id)} className="delete-comment-btn">
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
                 </div>
-              )}
 
-              {ticket.status === 'RESOLVED' && (
-                <div className="info-block resolved-block">
-                  <p className="detail-label" style={{color: '#065f46'}}>Resolution Notes</p>
-                  <p className="detail-value">{ticket.resolutionNotes || 'Task completed.'}</p>
-                </div>
-              )}
+                <form className="comment-form" onSubmit={handlePostComment}>
+                  <textarea 
+                    placeholder="Write a comment or update..."
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    required
+                  />
+                  <button type="submit" disabled={commentLoading}>
+                    {commentLoading ? '...' : <Send size={18} />}
+                  </button>
+                </form>
+              </div>
             </div>
+
+            {/* Admin Sidebar */}
+            {user.role === 'ADMIN' && (
+              <div className="admin-sidebar">
+                <div className="admin-card">
+                  <h3><Shield size={20} /> Management Panel</h3>
+                  
+                  {/* Assign Staff */}
+                  <div className="admin-section">
+                    <label>Assign Technician</label>
+                    <form onSubmit={handleAssign} className="admin-form-group">
+                      <input 
+                        type="text" 
+                        placeholder="Staff Name"
+                        value={staffName}
+                        onChange={(e) => setStaffName(e.target.value)}
+                      />
+                      <button type="submit" disabled={adminActionLoading}>
+                        {adminActionLoading ? '...' : 'Assign'}
+                      </button>
+                    </form>
+                  </div>
+
+                  {/* Update Status */}
+                  <div className="admin-section">
+                    <label>Quick Actions</label>
+                    <div className="status-buttons">
+                      <button 
+                        className="btn-in-progress" 
+                        onClick={() => { setSelectedStatus('IN_PROGRESS'); setShowStatusModal(true); }}
+                      >In Progress</button>
+                      <button 
+                        className="btn-resolved" 
+                        onClick={() => { setSelectedStatus('RESOLVED'); setShowStatusModal(true); }}
+                      >Mark Resolved</button>
+                      <button 
+                        className="btn-rejected" 
+                        onClick={() => { setSelectedStatus('REJECTED'); setShowStatusModal(true); }}
+                      >Reject</button>
+                    </div>
+                  </div>
+
+                  <div className="admin-meta">
+                    <p>Submitted by: <strong>{ticket.userFullName}</strong></p>
+                    <p>Contact: {ticket.userEmail}</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </main>
+
+      {/* Status Modal */}
+      {showStatusModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>Update Ticket to {selectedStatus}</h2>
+            
+            {selectedStatus === 'REJECTED' && (
+              <div className="modal-field">
+                <label>Rejection Reason</label>
+                <textarea 
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  placeholder="Enter reason for rejection..."
+                />
+              </div>
+            )}
+
+            {selectedStatus === 'RESOLVED' && (
+              <div className="modal-field">
+                <label>Resolution Notes</label>
+                <textarea 
+                  value={resolutionNotes}
+                  onChange={(e) => setResolutionNotes(e.target.value)}
+                  placeholder="What was the core solution?"
+                />
+              </div>
+            )}
+
+            <div className="modal-actions">
+              <button 
+                className="modal-cancel-btn" 
+                onClick={() => setShowStatusModal(false)}
+              >Cancel</button>
+              <button 
+                className="modal-submit-btn" 
+                onClick={handleUpdateStatus}
+                disabled={adminActionLoading}
+              >
+                {adminActionLoading ? 'Updating...' : 'Confirm Update'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
