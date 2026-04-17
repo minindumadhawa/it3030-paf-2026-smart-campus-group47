@@ -7,6 +7,7 @@ import backend.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import backend.service.NotificationService;
 
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,10 @@ public class BookingController {
 
     @Autowired
     private BookingService bookingService;
+
+    // ✅ ADDED - NotificationService inject කරනවා
+    @Autowired
+    private NotificationService notificationService;
 
     @PostMapping
     public ResponseEntity<?> createBooking(@RequestBody BookingRequest request) {
@@ -48,6 +53,23 @@ public class BookingController {
             String reason = body.get("adminReason");
             BookingStatus newStatus = BookingStatus.valueOf(statusStr);
             BookingResponse response = bookingService.updateBookingStatus(id, newStatus, reason);
+
+            // ✅ ADDED - Booking approve/reject වෙලාවට notification
+            if (newStatus == BookingStatus.APPROVED) {
+                notificationService.createNotification(
+                        response.getUserId(),
+                        "Your booking for '" + response.getResourceName() + "' has been APPROVED!",
+                        "BOOKING_APPROVED"
+                );
+            } else if (newStatus == BookingStatus.REJECTED) {
+                notificationService.createNotification(
+                        response.getUserId(),
+                        "Your booking for '" + response.getResourceName() + "' has been REJECTED." +
+                                (reason != null ? " Reason: " + reason : ""),
+                        "BOOKING_REJECTED"
+                );
+            }
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

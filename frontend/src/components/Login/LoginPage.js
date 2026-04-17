@@ -36,11 +36,9 @@ const LoginPage = () => {
     }
   };
 
-  const handleGoogleLogin = () => {
-    // Placeholder function for OAuth 2.0 integration with Spring Boot Backend
-    console.log('Initiating Google OAuth 2.0 Login Flow...');
-    // Example: window.location.href = 'http://localhost:8080/oauth2/authorization/google';
-  };
+ const handleGoogleLogin = () => {
+  window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+};
 
   return (
     <div className="login-container">
