@@ -107,10 +107,17 @@
   padding: 0.8rem 1rem;
   border-radius: 10px;
   border: 1px solid #e2e8f0;
-  background-color: #f8fafc;
+  background-color: #ffffff; /* Explicit white background */
+  color: #0f172a; /* Explicit dark text color */
   font-size: 1rem;
   transition: all 0.3s ease;
 }
+
+.form-group select option {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
 
 .form-group input:focus,
 .form-group select:focus,

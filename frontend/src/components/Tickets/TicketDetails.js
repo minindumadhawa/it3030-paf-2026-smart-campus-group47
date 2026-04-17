@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import ticketService from '../../services/ticketService';
 import commentService from '../../services/commentService';
+import CommentSection from './CommentSection';
 import './TicketDetails.css';
 
 const statusIcons = {
@@ -224,46 +225,8 @@ const TicketDetails = () => {
                 </div>
               </div>
 
-              {/* Comments Section */}
-              <div className="comments-section">
-                <h3><Clock size={20} /> Discussion & Logs</h3>
-                <div className="comments-list">
-                  {comments.length === 0 ? (
-                    <p className="no-comments">No updates or comments yet.</p>
-                  ) : (
-                    comments.map(comment => (
-                      <div key={comment.id} className="comment-card">
-                        <div className="comment-header">
-                          <span className="comment-user">
-                            <User size={14} /> {comment.userFullName}
-                          </span>
-                          <span className="comment-date">{formatDate(comment.createdAt)}</span>
-                        </div>
-                        <div className="comment-content">{comment.content}</div>
-                        {(user.role === 'ADMIN' || user.id === comment.userId) && (
-                          <div className="comment-actions">
-                            <button onClick={() => handleDeleteComment(comment.id)} className="delete-comment-btn">
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </div>
-
-                <form className="comment-form" onSubmit={handlePostComment}>
-                  <textarea 
-                    placeholder="Write a comment or update..."
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    required
-                  />
-                  <button type="submit" disabled={commentLoading}>
-                    {commentLoading ? '...' : <Send size={18} />}
-                  </button>
-                </form>
-              </div>
+              {/* Correct placement of Comment Section component */}
+              <CommentSection ticketId={id} />
             </div>
 
             {/* Admin Sidebar */}
