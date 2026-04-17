@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import backend.service.NotificationService;
 import java.util.List;
 
 @RestController
@@ -19,6 +19,10 @@ public class TicketController {
 
     @Autowired
     private backend.service.AttachmentService attachmentService;
+
+    // ✅ ADDED - NotificationService inject කරනවා
+    @Autowired
+    private NotificationService notificationService;
 
     @PostMapping
     public ResponseEntity<TicketResponse> createTicket(@RequestBody TicketRequest request) {
@@ -64,7 +68,15 @@ public class TicketController {
 
     @PutMapping("/{id}/status")
     public ResponseEntity<TicketResponse> updateStatus(@PathVariable Long id, @RequestBody TicketStatusRequest request) {
-        return ResponseEntity.ok(ticketService.updateStatus(id, request));
+        TicketResponse response = ticketService.updateStatus(id, request);
+        // ✅ ADDED - Ticket status change වෙලාවට notification
+        notificationService.createNotification(
+                response.getUserId(),
+                "Your ticket for '" + response.getLocationOrResource() + "' status changed to " + response.getStatus(),
+                "TICKET_UPDATE"
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}/resolution")
