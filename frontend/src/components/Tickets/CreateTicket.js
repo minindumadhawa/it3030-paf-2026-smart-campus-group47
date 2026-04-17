@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Wrench, MapPin, Phone, AlertCircle, ChevronLeft, LogOut } from 'lucide-react';
+import { Wrench, MapPin, Phone, AlertCircle, ChevronLeft, LogOut, Image as ImageIcon, X, Upload } from 'lucide-react';
 import ticketService from '../../services/ticketService';
 import './CreateTicket.css';
 
@@ -19,6 +19,9 @@ const CreateTicket = () => {
     preferredContactDetails: '',
   });
 
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [previews, setPreviews] = useState([]);
+
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -31,6 +34,36 @@ const CreateTicket = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setErrorMsg('');
+  };
+
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    setErrorMsg('');
+
+    if (files.length > 3) {
+      setErrorMsg('You can only attach up to 3 images.');
+      return;
+    }
+
+    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+    if (imageFiles.length !== files.length) {
+      setErrorMsg('Only image files are allowed.');
+      return;
+    }
+
+    setSelectedFiles(imageFiles);
+    const filePreviews = imageFiles.map(file => URL.createObjectURL(file));
+    setPreviews(filePreviews);
+  };
+
+  const removeFile = (index) => {
+    const newFiles = [...selectedFiles];
+    newFiles.splice(index, 1);
+    setSelectedFiles(newFiles);
+
+    const newPreviews = [...previews];
+    newPreviews.splice(index, 1);
+    setPreviews(newPreviews);
   };
 
   const handleSubmit = async (e) => {
@@ -47,7 +80,8 @@ const CreateTicket = () => {
 
     setLoading(true);
     try {
-      await ticketService.createTicket({
+      // 1. Create the Ticket
+      const newTicket = await ticketService.createTicket({
         userId: user.id,
         category: formData.category,
         description: formData.description.trim(),
@@ -56,7 +90,13 @@ const CreateTicket = () => {
         preferredContactDetails: formData.preferredContactDetails,
       });
 
-      setSuccessMsg('✅ Ticket submitted successfully! Redirecting...');
+      // 2. Upload Images if any
+      if (selectedFiles.length > 0) {
+        setSuccessMsg('📤 Ticket created. Uploading evidence...');
+        await ticketService.uploadAttachments(newTicket.id, selectedFiles);
+      }
+
+      setSuccessMsg('✅ Ticket and evidence submitted successfully! Redirecting...');
       setTimeout(() => navigate('/tickets/my'), 2000);
     } catch (err) {
       setErrorMsg(err.message || 'Server error. Please try again later.');
@@ -161,6 +201,31 @@ const CreateTicket = () => {
                 value={formData.preferredContactDetails}
                 onChange={handleChange}
               />
+            </div>
+
+            <div className="form-group">
+              <label><ImageIcon size={16} style={{verticalAlign: 'middle', marginRight: '5px'}}/> Attach Evidence (Max 3 Images)</label>
+              <div className="create-upload-container">
+                <label className="create-upload-label">
+                  <input type="file" multiple accept="image/*" onChange={handleFileChange} disabled={loading} />
+                  <div className="create-upload-btn">
+                    <Upload size={18} /> Select Images
+                  </div>
+                </label>
+
+                {previews.length > 0 && (
+                  <div className="create-previews-grid">
+                    {previews.map((url, index) => (
+                      <div key={index} className="create-preview-item">
+                        <img src={url} alt="preview" />
+                        <button type="button" className="create-remove-btn" onClick={() => removeFile(index)}>
+                          <X size={12} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="form-actions">

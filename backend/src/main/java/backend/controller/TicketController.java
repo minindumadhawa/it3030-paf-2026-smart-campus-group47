@@ -17,9 +17,25 @@ public class TicketController {
     @Autowired
     private TicketService ticketService;
 
+    @Autowired
+    private backend.service.AttachmentService attachmentService;
+
     @PostMapping
     public ResponseEntity<TicketResponse> createTicket(@RequestBody TicketRequest request) {
         return new ResponseEntity<>(ticketService.createTicket(request), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/{id}/attachments")
+    public ResponseEntity<List<TicketAttachmentResponse>> uploadAttachments(
+            @PathVariable Long id,
+            @RequestParam("files") List<org.springframework.web.multipart.MultipartFile> files) throws java.io.IOException {
+        
+        List<backend.model.TicketAttachment> attachments = attachmentService.saveAttachments(id, files);
+        List<TicketAttachmentResponse> response = attachments.stream()
+                .map(a -> new TicketAttachmentResponse(a.getId(), a.getFileName(), a.getFileType(), "/api/uploads/tickets/" + a.getFilePath()))
+                .toList();
+        
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/my")

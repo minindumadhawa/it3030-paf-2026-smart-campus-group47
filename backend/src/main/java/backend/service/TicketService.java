@@ -24,6 +24,9 @@ public class TicketService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private backend.repository.TicketAttachmentRepository attachmentRepository;
+
     public TicketResponse createTicket(TicketRequest request) {
         if (request.getUserId() == null) throw new ValidationException("User ID is required.");
         if (request.getCategory() == null) throw new ValidationException("Category is required.");
@@ -53,7 +56,7 @@ public class TicketService {
 
     public List<TicketResponse> getMyTickets(Long userId) {
         return ticketRepository.findByUserId(userId).stream()
-                .map(TicketResponse::fromEntity)
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
@@ -62,7 +65,7 @@ public class TicketService {
             throw new UnauthorizedException("Access denied. Only Admins can view all tickets.");
         }
         return ticketRepository.findAll().stream()
-                .map(TicketResponse::fromEntity)
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
@@ -76,7 +79,16 @@ public class TicketService {
             throw new UnauthorizedException("Access denied. You can only view your own tickets.");
         }
 
-        return TicketResponse.fromEntity(ticket);
+        return mapToResponse(ticket);
+    }
+
+    private TicketResponse mapToResponse(Ticket ticket) {
+        TicketResponse response = TicketResponse.fromEntity(ticket);
+        List<backend.model.TicketAttachment> attachments = attachmentRepository.findByTicketId(ticket.getId());
+        response.setAttachments(attachments.stream()
+                .map(a -> new TicketAttachmentResponse(a.getId(), a.getFileName(), a.getFileType(), "/api/uploads/tickets/" + a.getFilePath()))
+                .collect(java.util.stream.Collectors.toList()));
+        return response;
     }
 
     public TicketResponse assignStaff(Long ticketId, TicketAssignRequest request) {

@@ -96,6 +96,26 @@ const ticketService = {
       throw new Error(error.error || 'Failed to update resolution');
     }
     return response.json();
+  },
+
+  // [New] Upload image attachments
+  uploadAttachments: async (ticketId, files) => {
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append('files', file);
+    });
+
+    const response = await fetch(`${API_URL}/tickets/${ticketId}/attachments`, {
+      method: 'POST',
+      // Note: fetch automatically sets Content-Type to multipart/form-data for FormData
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to upload attachments');
+    }
+    return response.json();
   }
 };
 

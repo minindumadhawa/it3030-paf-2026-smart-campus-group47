@@ -3,11 +3,12 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { 
   ChevronLeft, Calendar, User, Mail, MapPin, Phone, 
   CheckCircle, XCircle, Clock, AlertCircle, LogOut,
-  Send, Trash2, Shield, Info, ArrowRight
+  Send, Trash2, Shield, Info, ArrowRight, Image
 } from 'lucide-react';
 import ticketService from '../../services/ticketService';
 import commentService from '../../services/commentService';
 import CommentSection from './CommentSection';
+import UploadAttachment from './UploadAttachment';
 import './TicketDetails.css';
 
 const statusIcons = {
@@ -198,6 +199,35 @@ const TicketDetails = () => {
 
               {/* Discussion Section */}
               <CommentSection ticketId={id} />
+            </div>
+
+            {/* Evidence & Upload Sidebar (for Student/Reporter) */}
+            <div className="admin-sidebar" style={{marginTop: user.role === 'ADMIN' ? '2rem' : '0'}}>
+              <div className="admin-card">
+                <h3><Image size={20} className="icon-orange" /> Attached Evidence</h3>
+                
+                <div className="attachment-gallery">
+                  {ticket.attachments && ticket.attachments.length > 0 ? (
+                    <div className="image-grid-small">
+                      {ticket.attachments.map(att => (
+                        <a key={att.id} href={`http://localhost:8080${att.url}`} target="_blank" rel="noreferrer" className="img-thumb-link">
+                          <img src={`http://localhost:8080${att.url}`} alt={att.fileName} />
+                        </a>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="empty-state-text">No images attached to this record.</p>
+                  )}
+                </div>
+
+                {user.role === 'STUDENT' && ticket.status === 'OPEN' && (
+                  <UploadAttachment 
+                    ticketId={id} 
+                    currentAttachmentCount={ticket.attachments?.length || 0}
+                    onUploadSuccess={() => fetchTicketData(id, user.id, user.role)}
+                  />
+                )}
+              </div>
             </div>
 
             {/* Admin Management Sidebar */}

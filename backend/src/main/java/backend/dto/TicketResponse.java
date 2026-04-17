@@ -21,6 +21,7 @@ public class TicketResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String assignedStaffName;
+    private java.util.List<TicketAttachmentResponse> attachments;
 
     // User info
     private Long userId;
@@ -98,4 +99,7 @@ public class TicketResponse {
 
     public String getUserEmail() { return userEmail; }
     public void setUserEmail(String userEmail) { this.userEmail = userEmail; }
+
+    public java.util.List<TicketAttachmentResponse> getAttachments() { return attachments; }
+    public void setAttachments(java.util.List<TicketAttachmentResponse> attachments) { this.attachments = attachments; }
 }
