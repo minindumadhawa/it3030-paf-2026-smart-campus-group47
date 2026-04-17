@@ -3,10 +3,11 @@ import React from 'react';
 const NotificationItem = ({ notification, onRead }) => {
   const getIcon = (type) => {
     switch (type) {
-      case 'BOOKING': return '📅';
-      case 'TICKET': return '🔧';
-      case 'COMMENT': return '💬';
-      default: return '🔔';
+      case 'BOOKING_APPROVED': return '✅';
+      case 'BOOKING_REJECTED': return '❌';
+      case 'TICKET_UPDATE':    return '🔧';
+      case 'NEW_COMMENT':      return '💬';
+      default:                 return '🔔';
     }
   };
 
@@ -26,17 +27,29 @@ const NotificationItem = ({ notification, onRead }) => {
       style={{
         display: 'flex', alignItems: 'flex-start', gap: '12px',
         padding: '12px 16px', borderBottom: '1px solid #f1f5f9',
-        cursor: 'pointer', background: notification.read ? 'white' : '#eff6ff',
+        cursor: notification.read ? 'default' : 'pointer',
+        background: notification.read ? 'white' : '#fff5f5',
+        borderLeft: notification.read ? 'none' : '3px solid #ef4444',
         transition: 'background 0.12s'
       }}
     >
-      <span style={{ fontSize: 18, flexShrink: 0, marginTop: 2 }}>{getIcon(notification.type)}</span>
+      <span style={{ fontSize: 18, flexShrink: 0, marginTop: 2 }}>
+        {getIcon(notification.type)}
+      </span>
       <div style={{ flex: 1 }}>
-        <p style={{ fontSize: 13, color: '#334155', margin: '0 0 4px', lineHeight: 1.5 }}>{notification.message}</p>
-        <span style={{ fontSize: 11, color: '#94a3b8' }}>{timeAgo(notification.createdAt)}</span>
+        <p style={{ fontSize: 13, color: '#334155', margin: '0 0 4px', lineHeight: 1.5 }}>
+          {notification.message}
+        </p>
+        <span style={{ fontSize: 11, color: '#94a3b8' }}>
+          {timeAgo(notification.createdAt)}
+        </span>
       </div>
+      {/* 🔴 Unread red badge */}
       {!notification.read && (
-        <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#3b82f6', flexShrink: 0, marginTop: 6 }} />
+        <div style={{
+          width: 10, height: 10, borderRadius: '50%',
+          background: '#ef4444', flexShrink: 0, marginTop: 6
+        }} />
       )}
     </div>
   );
