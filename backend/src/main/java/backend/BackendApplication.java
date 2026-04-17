@@ -21,11 +21,8 @@ public class BackendApplication implements WebMvcConfigurer {
 
 	private void exposeDirectory(String dirName, ResourceHandlerRegistry registry) {
 		Path uploadDir = Paths.get(dirName);
-		String uploadPath = uploadDir.toFile().getAbsolutePath();
-		
-		if (dirName.startsWith("../")) dirName = dirName.replace("../", "");
 		
 		registry.addResourceHandler("/api/uploads/tickets/**")
-				.addResourceLocations("file:/" + uploadPath + "/");
+				.addResourceLocations(uploadDir.toUri().toString());
 	}
 }
