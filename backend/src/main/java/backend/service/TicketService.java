@@ -2,6 +2,8 @@ package backend.service;
 
 import backend.dto.*;
 import backend.exception.TicketNotFoundException;
+import backend.exception.UnauthorizedException;
+import backend.exception.ValidationException;
 import backend.model.Ticket;
 import backend.model.TicketStatus;
 import backend.model.User;
@@ -22,34 +24,26 @@ public class TicketService {
     @Autowired
     private UserRepository userRepository;
 
-    // Create a new ticket
     public TicketResponse createTicket(TicketRequest request) {
-
-        // Validate required fields
-        if (request.getUserId() == null) {
-            throw new IllegalArgumentException("User ID is required.");
-        }
-        if (request.getCategory() == null) {
-            throw new IllegalArgumentException("Category is required.");
-        }
+        if (request.getUserId() == null) throw new ValidationException("User ID is required.");
+        if (request.getCategory() == null) throw new ValidationException("Category is required.");
         if (request.getDescription() == null || request.getDescription().trim().isEmpty()) {
-            throw new IllegalArgumentException("Description is required.");
+            throw new ValidationException("Description is required.");
         }
-        if (request.getPriority() == null) {
-            throw new IllegalArgumentException("Priority is required.");
+        if (request.getDescription().trim().length() < 10) {
+            throw new ValidationException("Description must be at least 10 characters long.");
         }
+        if (request.getPriority() == null) throw new ValidationException("Priority is required.");
 
-        // Find the user who is creating the ticket
         User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + request.getUserId()));
+                .orElseThrow(() -> new TicketNotFoundException("User not found with id: " + request.getUserId()));
 
-        // Build the ticket
         Ticket ticket = new Ticket();
         ticket.setUser(user);
         ticket.setCategory(request.getCategory());
         ticket.setDescription(request.getDescription().trim());
         ticket.setPriority(request.getPriority());
-        ticket.setStatus(TicketStatus.OPEN); // default status
+        ticket.setStatus(TicketStatus.OPEN);
         ticket.setLocationOrResource(request.getLocationOrResource());
         ticket.setPreferredContactDetails(request.getPreferredContactDetails());
 
@@ -57,80 +51,72 @@ public class TicketService {
         return TicketResponse.fromEntity(saved);
     }
 
-    // Get all tickets created by a specific user
     public List<TicketResponse> getMyTickets(Long userId) {
-        List<Ticket> tickets = ticketRepository.findByUserId(userId);
-        return tickets.stream()
+        return ticketRepository.findByUserId(userId).stream()
                 .map(TicketResponse::fromEntity)
                 .collect(Collectors.toList());
     }
 
-    // Get a single ticket by ID
-    // Regular users can only view their own tickets, admin can view any
     public TicketResponse getTicketById(Long ticketId, Long requestingUserId, String role) {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new TicketNotFoundException("Ticket not found with id: " + ticketId));
 
-        // Admin can view any ticket
-        if ("ADMIN".equalsIgnoreCase(role)) {
-            return TicketResponse.fromEntity(ticket);
-        }
+        if ("ADMIN".equalsIgnoreCase(role)) return TicketResponse.fromEntity(ticket);
 
-        // Regular user can only view their own ticket
         if (!ticket.getUser().getId().equals(requestingUserId)) {
-            throw new IllegalArgumentException("Access denied. You can only view your own tickets.");
+            throw new UnauthorizedException("Access denied. You can only view your own tickets.");
         }
 
         return TicketResponse.fromEntity(ticket);
     }
 
-    // Assign a staff member to a ticket (Admin only)
     public TicketResponse assignStaff(Long ticketId, TicketAssignRequest request) {
         if (!"ADMIN".equalsIgnoreCase(request.getAdminRole())) {
-            throw new IllegalArgumentException("Access denied. Only Admins can assign staff.");
+            throw new UnauthorizedException("Access denied. Only Admins can assign staff.");
+        }
+        if (request.getAssignedStaffName() == null || request.getAssignedStaffName().trim().isEmpty()) {
+            throw new ValidationException("Staff name is required for assignment.");
         }
 
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new TicketNotFoundException("Ticket not found with id: " + ticketId));
 
         ticket.setAssignedStaffName(request.getAssignedStaffName());
-        ticket.setStatus(TicketStatus.IN_PROGRESS); // Auto transition to IN_PROGRESS when assigned
-
-        Ticket updated = ticketRepository.save(ticket);
-        return TicketResponse.fromEntity(updated);
+        ticket.setStatus(TicketStatus.IN_PROGRESS);
+        return TicketResponse.fromEntity(ticketRepository.save(ticket));
     }
 
-    // Update ticket status (Admin only for now)
     public TicketResponse updateStatus(Long ticketId, TicketStatusRequest request) {
         if (!"ADMIN".equalsIgnoreCase(request.getRole())) {
-            throw new IllegalArgumentException("Access denied. Only Admins can update status for now.");
+            throw new UnauthorizedException("Access denied. Only Admins can update status.");
         }
+        if (request.getStatus() == null) throw new ValidationException("Status is required.");
 
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new TicketNotFoundException("Ticket not found with id: " + ticketId));
 
         ticket.setStatus(request.getStatus());
-        
         if (request.getStatus() == TicketStatus.REJECTED) {
+            if (request.getRejectionReason() == null || request.getRejectionReason().trim().isEmpty()) {
+                throw new ValidationException("Rejection reason is required.");
+            }
             ticket.setRejectionReason(request.getRejectionReason());
         }
-
-        Ticket updated = ticketRepository.save(ticket);
-        return TicketResponse.fromEntity(updated);
+        return TicketResponse.fromEntity(ticketRepository.save(ticket));
     }
 
-    // Update resolution notes (Admin only for now)
     public TicketResponse updateResolution(Long ticketId, TicketResolutionRequest request) {
         if (!"ADMIN".equalsIgnoreCase(request.getRole())) {
-            throw new IllegalArgumentException("Access denied. Only Admins can update resolution notes.");
+            throw new UnauthorizedException("Access denied. Only Admins can update resolution notes.");
+        }
+        if (request.getResolutionNotes() == null || request.getResolutionNotes().trim().isEmpty()) {
+            throw new ValidationException("Resolution notes are required.");
         }
 
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new TicketNotFoundException("Ticket not found with id: " + ticketId));
 
         ticket.setResolutionNotes(request.getResolutionNotes());
-        
-        Ticket updated = ticketRepository.save(ticket);
-        return TicketResponse.fromEntity(updated);
+        return TicketResponse.fromEntity(ticketRepository.save(ticket));
     }
 }
