@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { PlusCircle, Clock, CheckCircle, XCircle, AlertCircle, ChevronRight, LayoutDashboard, LogOut } from 'lucide-react';
+import { 
+  PlusCircle, Clock, CheckCircle, XCircle, 
+  AlertCircle, ChevronRight, LayoutDashboard, LogOut,
+  MapPin, Calendar
+} from 'lucide-react';
 import ticketService from '../../services/ticketService';
 import './MyTickets.css';
 
@@ -10,14 +14,6 @@ const statusIcons = {
   RESOLVED: <CheckCircle size={16} />,
   REJECTED: <XCircle size={16} />,
   CLOSED: <CheckCircle size={16} />,
-};
-
-const borderClasses = {
-  OPEN: 'border-open',
-  IN_PROGRESS: 'border-in-progress',
-  RESOLVED: 'border-resolved',
-  REJECTED: 'border-rejected',
-  CLOSED: 'border-closed',
 };
 
 const MyTickets = () => {
@@ -42,12 +38,20 @@ const MyTickets = () => {
     setLoading(true);
     try {
       const data = await ticketService.getMyTickets(userId);
-      setTickets(data);
+      // Sort by latest first
+      const sortedData = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setTickets(sortedData);
     } catch (err) {
       setErrorMsg(err.message || 'Failed to load tickets.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatDate = (dateStr) => {
+    return new Date(dateStr).toLocaleDateString('en-GB', {
+      day: '2-digit', month: 'short', year: 'numeric'
+    });
   };
 
   if (!user) return <div className="ticket-loading">Authenticating...</div>;
@@ -68,30 +72,30 @@ const MyTickets = () => {
         <div className="tickets-header">
           <div>
             <h1>My Tickets</h1>
-            <p style={{color: 'var(--text-muted)'}}>Manage and track your maintenance requests</p>
+            <p>Track and manage your maintenance requests in real-time</p>
           </div>
-          <button className="submit-btn" onClick={() => navigate('/tickets/create')} style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-            <PlusCircle size={20} /> Create New Ticket
+          <button className="submit-btn" onClick={() => navigate('/tickets/create')}>
+            <PlusCircle size={20} /> New Ticket
           </button>
         </div>
 
         {loading ? (
-          <div className="loading-spinner">Loading your tickets...</div>
+          <div className="loading-spinner">Loading your requests...</div>
         ) : errorMsg ? (
           <div className="alert-error">{errorMsg}</div>
         ) : tickets.length === 0 ? (
           <div className="empty-tickets">
-            <LayoutDashboard size={48} style={{color: 'var(--border-color)', marginBottom: '1rem'}}/>
-            <h3>No tickets found</h3>
-            <p>You haven't submitted any maintenance requests yet.</p>
-            <button className="view-btn" onClick={() => navigate('/tickets/create')} style={{maxWidth: '200px', margin: '1.5rem auto 0'}}>
-              Submit First Ticket
+            <LayoutDashboard size={64} style={{marginBottom: '1.5rem', opacity: 0.2}}/>
+            <h3>No requests yet</h3>
+            <p>Need help with something? Create your first ticket now.</p>
+            <button className="view-btn" onClick={() => navigate('/tickets/create')} style={{maxWidth: '240px', margin: '2rem auto 0', background: '#0b2239', color: 'white'}}>
+              Submit a Request
             </button>
           </div>
         ) : (
           <div className="tickets-grid">
             {tickets.map(ticket => (
-              <div key={ticket.id} className={`ticket-card ${borderClasses[ticket.status]}`}>
+              <div key={ticket.id} className="ticket-card">
                 <div className="card-header">
                   <span className="category-tag">{ticket.category.replace('_', ' ')}</span>
                   <span className="ticket-id">#{ticket.id}</span>
@@ -99,23 +103,26 @@ const MyTickets = () => {
                 
                 <p className="ticket-desc-preview">{ticket.description}</p>
                 
-                {ticket.locationOrResource && (
-                  <div style={{fontSize: '0.9rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '5px'}}>
-                    <LayoutDashboard size={14} /> {ticket.locationOrResource}
+                <div className="card-meta">
+                  <div className="meta-item">
+                    <MapPin size={14} /> {ticket.locationOrResource || 'N/A'}
                   </div>
-                )}
+                  <div className="meta-item">
+                    <Calendar size={14} /> {formatDate(ticket.createdAt)}
+                  </div>
+                </div>
                 
                 <div className="card-footer">
-                  <span className={`badge status-${ticket.status.toLowerCase().replace('_', '-')}`} style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
+                  <span className={`badge status-${ticket.status.toLowerCase().replace('_', '-')}`}>
                     {statusIcons[ticket.status]} {ticket.status.replace('_', ' ')}
                   </span>
-                  <span className="priority-badge">
+                  <div className="priority-badge">
                     <AlertCircle size={14} /> {ticket.priority}
-                  </span>
+                  </div>
                 </div>
                 
                 <Link to={`/tickets/${ticket.id}`} className="view-btn">
-                  View Full Details <ChevronRight size={16} style={{float: 'right', marginTop: '3px'}}/>
+                  View Case Details
                 </Link>
               </div>
             ))}

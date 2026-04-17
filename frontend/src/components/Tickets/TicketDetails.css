@@ -2,27 +2,13 @@
     min-height: 100vh;
     background-color: #f8fafc;
     color: #1e293b;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', sans-serif;
   }
   
-  /* Layout */
   .details-main {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem 1rem;
-  }
-  
-  .detail-layout {
-    display: grid;
-    grid-template-columns: 1fr 350px;
-    gap: 2rem;
-    margin-top: 1.5rem;
-  }
-  
-  @media (max-width: 968px) {
-    .detail-layout {
-      grid-template-columns: 1fr;
-    }
+    padding: 2rem 5% 5rem;
   }
   
   .back-link {
@@ -31,242 +17,152 @@
     gap: 0.5rem;
     color: #64748b;
     text-decoration: none;
-    font-size: 0.95rem;
-    margin-bottom: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
     transition: color 0.2s;
   }
   
-  .back-link:hover {
-    color: var(--primary-orange);
+  .back-link:hover { color: #F37021; }
+  
+  .detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 2rem;
+    align-items: start;
   }
   
-  /* Main Card */
+  /* Main Details Card */
   .details-card {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    padding: 2rem;
-    margin-bottom: 2rem;
+    background: #ffffff;
+    border-radius: 20px;
     border: 1px solid #e2e8f0;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   }
   
   .details-header {
+    background: #0b2239;
+    padding: 2.5rem;
+    color: white;
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid #f1f5f9;
-    margin-bottom: 1.5rem;
+    align-items: center;
   }
   
   .ticket-id-label {
-    color: #94a3b8;
-    font-size: 0.875rem;
+    font-size: 0.9rem;
     font-weight: 600;
-    margin-bottom: 0.25rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 0.5rem;
   }
   
   .ticket-title-heading {
-    font-size: 1.75rem;
+    font-size: 2rem;
     font-weight: 800;
-    color: #0f172a;
     margin: 0;
+    letter-spacing: -0.5px;
+    text-transform: capitalize;
   }
   
-  /* Status Badges */
   .status-badge-large {
-    padding: 0.5rem 1rem;
-    border-radius: 9999px;
-    font-size: 0.875rem;
+    padding: 0.6rem 1.25rem;
+    border-radius: 12px;
     font-weight: 700;
-    text-transform: uppercase;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.6rem;
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
   
-  .status-open { background: #eff6ff; color: #1d4ed8; }
-  .status-in-progress { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
-  .status-resolved { background: #f0fdf4; color: #15803d; }
-  .status-rejected { background: #fef2f2; color: #b91c1c; }
+  .details-body {
+    padding: 2.5rem;
+  }
   
-  /* Grid Info */
-  .details-grid {
+  .info-sections-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.5rem;
   }
   
-  .detail-block {
-    padding: 1rem;
-    background: #f8fafc;
-    border-radius: 12px;
-  }
-  
-  .full-width {
-    grid-column: 1 / -1;
-  }
-  
-  .detail-label {
-    font-size: 0.75rem;
-    color: #64748b;
-    font-weight: 600;
+  .info-section h4 {
+    font-size: 0.85rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.025em;
-    margin-bottom: 0.5rem;
+    color: #94a3b8;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 0.5rem;
   }
   
-  .detail-value {
+  .detail-item {
+    margin-bottom: 1.5rem;
+  }
+  
+  .detail-item-label {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 0.4rem;
+    display: block;
+  }
+  
+  .detail-item-value {
     font-weight: 600;
-    color: #334155;
+    color: #1e293b;
     display: flex;
     align-items: center;
     gap: 0.5rem;
   }
   
-  .description-text {
-    font-size: 1.125rem;
-    line-height: 1.6;
-    color: #1e293b;
-    white-space: pre-wrap;
-  }
-  
-  .icon-orange { color: #F37021; }
-  
-  .priority-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    color: #F37021;
-    font-weight: 700;
-  }
-  
-  /* Blocks for Resolved/Rejected */
-  .info-block {
-    margin-top: 1.5rem;
-    padding: 1.25rem;
-    border-radius: 12px;
-  }
-  
-  .rejected-block { background: #fef2f2; border-left: 4px solid #ef4444; }
-  .resolved-block { background: #f0fdf4; border-left: 4px solid #22c55e; }
-  
-  /* Comments Section */
-  .comments-section {
-    background: white;
-    border-radius: 16px;
-    padding: 1.5rem;
-    border: 1px solid #e2e8f0;
-  }
-  
-  .comments-list {
-    margin: 1.5rem 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .comment-card {
-    padding: 1rem;
+  .description-box {
     background: #f8fafc;
+    padding: 1.5rem;
     border-radius: 12px;
     border: 1px solid #e2e8f0;
+    line-height: 1.7;
+    color: #334155;
+    margin-bottom: 2rem;
   }
   
-  .comment-header {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.75rem;
-    margin-bottom: 0.5rem;
-  }
-  
-  .comment-user {
-    font-weight: 700;
-    color: #475569;
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-  
-  .comment-content {
-    font-size: 0.95rem;
-    color: #1e293b;
-    line-height: 1.5;
-  }
-  
-  .comment-actions {
-    margin-top: 0.5rem;
-    display: flex;
-    justify-content: flex-end;
-  }
-  
-  .delete-comment-btn {
-    background: transparent;
-    border: none;
-    color: #94a3b8;
-    cursor: pointer;
-    transition: color 0.2s;
-  }
-  
-  .delete-comment-btn:hover { color: #ef4444; }
-  
-  .comment-form {
-    display: flex;
-    gap: 0.75rem;
-    margin-top: 1rem;
-  }
-  
-  .comment-form textarea {
-    flex: 1;
-    padding: 0.75rem;
-    border-radius: 8px;
-    border: 1px solid #cbd5e1;
-    resize: none;
-    height: 45px;
-    font-family: inherit;
-  }
-  
-  .comment-form button {
-    background: #F37021;
-    color: white;
-    border: none;
-    padding: 0 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  
-  /* Admin Sidebar */
-  .admin-card {
+  /* Sidebar Admin Panel */
+  .admin-sidebar {
     position: sticky;
-    top: 2rem;
-    background: white;
-    padding: 1.5rem;
-    border-radius: 16px;
+    top: 6rem;
+  }
+  
+  .admin-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 2rem;
     border: 1px solid #e2e8f0;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   }
   
   .admin-card h3 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #0b2239;
+    margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    color: #0f172a;
+    gap: 0.6rem;
   }
   
   .admin-section {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
     padding-bottom: 1.5rem;
     border-bottom: 1px solid #f1f5f9;
   }
   
   .admin-section label {
-    display: block;
-    font-size: 0.875rem;
+    font-size: 0.85rem;
     font-weight: 700;
-    margin-bottom: 0.75rem;
-    color: #475569;
+    color: #64748b;
+    display: block;
+    margin-bottom: 1rem;
   }
   
   .admin-form-group {
@@ -276,76 +172,49 @@
   
   .admin-form-group input {
     flex: 1;
-    padding: 0.5rem;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-  }
-  
-  .admin-form-group button {
-    background: #0f172a;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    font-size: 0.9rem;
   }
   
   .status-buttons {
     display: grid;
-    gap: 0.5rem;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
   }
   
   .status-buttons button {
-    padding: 0.6rem;
-    border: none;
+    padding: 0.75rem;
     border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
     font-weight: 600;
     cursor: pointer;
-    transition: opacity 0.2s;
-  }
-  
-  .btn-in-progress { background: #fff7ed; color: #c2410c; }
-  .btn-resolved { background: #f0fdf4; color: #15803d; }
-  .btn-rejected { background: #fef2f2; color: #b91c1c; }
-  
-  /* Modal */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    transition: all 0.2s;
+    text-align: left;
     display: flex;
     align-items: center;
-    justify-content: center;
-    z-index: 1000;
+    justify-content: space-between;
   }
   
-  .modal-content {
-    background: white;
-    padding: 2rem;
-    border-radius: 16px;
-    width: 100%;
-    max-width: 500px;
-  }
+  .btn-in-progress:hover { border-color: #f97316; color: #f97316; background: #fff7ed; }
+  .btn-resolved:hover { border-color: #22c55e; color: #22c55e; background: #f0fdf4; }
+  .btn-rejected:hover { border-color: #ef4444; color: #ef4444; background: #fef2f2; }
   
-  .modal-field textarea {
-    width: 100%;
-    height: 100px;
-    padding: 0.75rem;
-    margin-top: 0.5rem;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-  }
+  /* Priority Color Modifiers */
+  .priority-high { color: #ef4444; }
+  .priority-medium { color: #f97316; }
+  .priority-low { color: #22c55e; }
   
-  .modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 1.5rem;
-  }
+  .icon-orange { color: #F37021; }
   
-  .modal-cancel-btn { background: #f1f5f9; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; }
-  .modal-submit-btn { background: #F37021; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; }
+  @media (max-width: 1024px) {
+    .detail-layout {
+      grid-template-columns: 1fr;
+    }
+    
+    .admin-sidebar {
+      position: static;
+    }
+  }

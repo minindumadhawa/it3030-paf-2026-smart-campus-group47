@@ -3,7 +3,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { 
   ChevronLeft, Calendar, User, Mail, MapPin, Phone, 
   CheckCircle, XCircle, Clock, AlertCircle, LogOut,
-  Send, Trash2, Shield
+  Send, Trash2, Shield, Info, ArrowRight
 } from 'lucide-react';
 import ticketService from '../../services/ticketService';
 import commentService from '../../services/commentService';
@@ -23,7 +23,6 @@ const TicketDetails = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [ticket, setTicket] = useState(null);
-  const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
   
@@ -34,10 +33,6 @@ const TicketDetails = () => {
   const [rejectionReason, setRejectionReason] = useState('');
   const [resolutionNotes, setResolutionNotes] = useState('');
   const [adminActionLoading, setAdminActionLoading] = useState(false);
-
-  // Comment States
-  const [newComment, setNewComment] = useState('');
-  const [commentLoading, setCommentLoading] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -56,9 +51,6 @@ const TicketDetails = () => {
       const ticketData = await ticketService.getTicketById(ticketId, userId, role);
       setTicket(ticketData);
       setStaffName(ticketData.assignedStaffName || '');
-      
-      const commentData = await commentService.getCommentsByTicket(ticketId);
-      setComments(commentData);
     } catch (err) {
       setErrorMsg(err.message || 'Failed to load details.');
     } finally {
@@ -99,33 +91,6 @@ const TicketDetails = () => {
     }
   };
 
-  const handlePostComment = async (e) => {
-    e.preventDefault();
-    if (!newComment.trim()) return;
-    
-    setCommentLoading(true);
-    try {
-      await commentService.addComment(id, user.id, user.role, newComment);
-      setNewComment('');
-      const commentData = await commentService.getCommentsByTicket(id);
-      setComments(commentData);
-    } catch (err) {
-      alert(err.message);
-    } finally {
-      setCommentLoading(false);
-    }
-  };
-
-  const handleDeleteComment = async (commentId) => {
-    if (!window.confirm('Delete this comment?')) return;
-    try {
-      await commentService.deleteComment(commentId, user.id, user.role);
-      setComments(comments.filter(c => c.id !== commentId));
-    } catch (err) {
-      alert(err.message);
-    }
-  };
-
   const formatDate = (dateStr) => {
     if (!dateStr) return 'N/A';
     return new Date(dateStr).toLocaleString('en-GB', {
@@ -144,7 +109,7 @@ const TicketDetails = () => {
           <button className="nav-link-btn" onClick={() => navigate('/dashboard')}>Dashboard</button>
           <button className="nav-link-btn" onClick={() => navigate('/tickets/my')}>My Tickets</button>
           <button className="logout-btn" onClick={() => { localStorage.removeItem('user'); navigate('/login'); }}>
-            <LogOut size={16} /> Logout
+            <LogOut size={16} style={{marginRight: '5px'}}/> Logout
           </button>
         </div>
       </nav>
@@ -155,17 +120,17 @@ const TicketDetails = () => {
         </Link>
 
         {loading ? (
-          <div className="loading-spinner">Fetching ticket details...</div>
+          <div className="loading-spinner">Fetching record details...</div>
         ) : errorMsg ? (
           <div className="alert-error">{errorMsg}</div>
         ) : (
           <div className="detail-layout">
             <div className="detail-left-col">
-              {/* Ticket Main Info */}
+              {/* Ticket Hero Section */}
               <div className="details-card">
                 <div className="details-header">
                   <div>
-                    <p className="ticket-id-label">Ticket ID: #{ticket.id}</p>
+                    <p className="ticket-id-label">Record Reference: #{ticket.id}</p>
                     <h1 className="ticket-title-heading">{ticket.category.replace('_', ' ')}</h1>
                   </div>
                   <span className={`status-badge-large status-${ticket.status.toLowerCase().replace('_', '-')}`}>
@@ -174,105 +139,106 @@ const TicketDetails = () => {
                 </div>
 
                 <div className="details-body">
-                  <div className="detail-block full-width">
-                    <p className="detail-label">Issue Description</p>
-                    <p className="detail-value description-text">{ticket.description}</p>
+                  <div className="info-section">
+                    <h4><Info size={16} /> Issue Information</h4>
+                    <div className="description-box">
+                      <p>{ticket.description}</p>
+                    </div>
+                    
+                    <div className="info-sections-grid">
+                      <div className="detail-item">
+                        <span className="detail-item-label">Priority Level</span>
+                        <div className={`detail-item-value priority-${ticket.priority.toLowerCase()}`}>
+                          <AlertCircle size={18} /> {ticket.priority}
+                        </div>
+                      </div>
+                      
+                      <div className="detail-item">
+                        <span className="detail-item-label">Submitted On</span>
+                        <div className="detail-item-value">
+                          <Calendar size={18} className="icon-orange" /> {formatDate(ticket.createdAt)}
+                        </div>
+                      </div>
+
+                      <div className="detail-item">
+                        <span className="detail-item-label">Location / Area</span>
+                        <div className="detail-item-value">
+                          <MapPin size={18} className="icon-orange" /> {ticket.locationOrResource || 'General Campus'}
+                        </div>
+                      </div>
+
+                      <div className="detail-item">
+                        <span className="detail-item-label">Assigned Technician</span>
+                        <div className="detail-item-value">
+                          <Shield size={18} className="icon-orange" /> {ticket.assignedStaffName || 'Pending Assignment'}
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="details-grid">
-                    <div className="detail-block">
-                      <p className="detail-label">Priority Level</p>
-                      <span className={`priority-pill ${ticket.priority.toLowerCase()}`}>
-                        <AlertCircle size={16} /> {ticket.priority}
-                      </span>
-                    </div>
-
-                    <div className="detail-block">
-                      <p className="detail-label">Location / Resource</p>
-                      <p className="detail-value">
-                        <MapPin size={18} className="icon-orange"/> {ticket.locationOrResource || 'Not specified'}
-                      </p>
-                    </div>
-
-                    <div className="detail-block">
-                      <p className="detail-label">Assigned Staff</p>
-                      <p className="detail-value">
-                        <Shield size={18} className="icon-orange"/> {ticket.assignedStaffName || 'Unassigned'}
-                      </p>
-                    </div>
-
-                    <div className="detail-block">
-                      <p className="detail-label">Preferred Contact</p>
-                      <p className="detail-value">
-                        <Phone size={18} className="icon-orange"/> {ticket.preferredContactDetails || 'Default'}
-                      </p>
-                    </div>
-                  </div>
-
-                  {ticket.status === 'REJECTED' && (
-                    <div className="info-block rejected-block">
-                      <p className="detail-label">Rejection Reason</p>
-                      <p className="detail-value">{ticket.rejectionReason}</p>
+                  {/* Resolution Info */}
+                  {(ticket.status === 'REJECTED' || ticket.status === 'RESOLVED') && (
+                    <div className="info-section" style={{marginTop: '2rem'}}>
+                      <h4><CheckCircle size={16} /> Resolution Information</h4>
+                      <div className={`description-box ${ticket.status === 'REJECTED' ? 'rejected-box' : 'resolved-box'}`}>
+                        <p><strong>{ticket.status === 'REJECTED' ? 'Rejection Reason:' : 'Resolution Notes:'}</strong></p>
+                        <p>{ticket.status === 'REJECTED' ? ticket.rejectionReason : ticket.resolutionNotes}</p>
+                      </div>
                     </div>
                   )}
 
-                  {ticket.status === 'RESOLVED' && (
-                    <div className="info-block resolved-block">
-                      <p className="detail-label">Resolution Notes</p>
-                      <p className="detail-value">{ticket.resolutionNotes}</p>
+                  <div className="info-section" style={{marginTop: '2rem'}}>
+                    <h4><Phone size={16} /> Primary Contact</h4>
+                    <div className="detail-item-value" style={{background: '#f1f5f9', padding: '1rem', borderRadius: '10px'}}>
+                      <Phone size={18} className="icon-orange" /> {ticket.preferredContactDetails || 'Default Contact Information'}
                     </div>
-                  )}
+                  </div>
                 </div>
               </div>
 
-              {/* Correct placement of Comment Section component */}
+              {/* Discussion Section */}
               <CommentSection ticketId={id} />
             </div>
 
-            {/* Admin Sidebar */}
+            {/* Admin Management Sidebar */}
             {user.role === 'ADMIN' && (
               <div className="admin-sidebar">
                 <div className="admin-card">
-                  <h3><Shield size={20} /> Management Panel</h3>
+                  <h3><Shield size={22} className="icon-orange" /> Management</h3>
                   
-                  {/* Assign Staff */}
                   <div className="admin-section">
-                    <label>Assign Technician</label>
+                    <label>Assign Resource</label>
                     <form onSubmit={handleAssign} className="admin-form-group">
                       <input 
                         type="text" 
-                        placeholder="Staff Name"
+                        placeholder="Staff / Dept Name"
                         value={staffName}
                         onChange={(e) => setStaffName(e.target.value)}
                       />
-                      <button type="submit" disabled={adminActionLoading}>
-                        {adminActionLoading ? '...' : 'Assign'}
+                      <button type="submit" disabled={adminActionLoading} className="icon-btn">
+                        <ArrowRight size={18} />
                       </button>
                     </form>
                   </div>
 
-                  {/* Update Status */}
                   <div className="admin-section">
-                    <label>Quick Actions</label>
+                    <label>Lifecycle Actions</label>
                     <div className="status-buttons">
-                      <button 
-                        className="btn-in-progress" 
-                        onClick={() => { setSelectedStatus('IN_PROGRESS'); setShowStatusModal(true); }}
-                      >In Progress</button>
-                      <button 
-                        className="btn-resolved" 
-                        onClick={() => { setSelectedStatus('RESOLVED'); setShowStatusModal(true); }}
-                      >Mark Resolved</button>
-                      <button 
-                        className="btn-rejected" 
-                        onClick={() => { setSelectedStatus('REJECTED'); setShowStatusModal(true); }}
-                      >Reject</button>
+                      <button className="btn-in-progress" onClick={() => { setSelectedStatus('IN_PROGRESS'); setShowStatusModal(true); }}>
+                        Set In Progress <ArrowRight size={16} />
+                      </button>
+                      <button className="btn-resolved" onClick={() => { setSelectedStatus('RESOLVED'); setShowStatusModal(true); }}>
+                        Mark Resolved <CheckCircle size={16} />
+                      </button>
+                      <button className="btn-rejected" onClick={() => { setSelectedStatus('REJECTED'); setShowStatusModal(true); }}>
+                        Reject Case <XCircle size={16} />
+                      </button>
                     </div>
                   </div>
 
-                  <div className="admin-meta">
-                    <p>Submitted by: <strong>{ticket.userFullName}</strong></p>
-                    <p>Contact: {ticket.userEmail}</p>
+                  <div className="admin-meta" style={{fontSize: '0.85rem', color: '#64748b'}}>
+                    <p>Reporter: <strong>{ticket.userFullName}</strong></p>
+                    <p style={{marginTop: '0.25rem'}}>{ticket.userEmail}</p>
                   </div>
                 </div>
               </div>
@@ -281,45 +247,45 @@ const TicketDetails = () => {
         )}
       </main>
 
-      {/* Status Modal */}
+      {/* Modern Status Modal */}
       {showStatusModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h2>Update Ticket to {selectedStatus}</h2>
+            <h2 style={{color: '#0b2239', marginBottom: '1rem'}}>Update Ticket State</h2>
+            <p style={{color: '#64748b', marginBottom: '2rem'}}>Changing status to <strong>{selectedStatus}</strong>. This update will be logged.</p>
             
             {selectedStatus === 'REJECTED' && (
               <div className="modal-field">
-                <label>Rejection Reason</label>
+                <label style={{fontWeight: '700', display: 'block', marginBottom: '0.5rem'}}>Formal Rejection Reason</label>
                 <textarea 
                   value={rejectionReason}
                   onChange={(e) => setRejectionReason(e.target.value)}
-                  placeholder="Enter reason for rejection..."
+                  placeholder="Explain why this request is being rejected..."
+                  style={{width: '100%', minHeight: '120px', padding: '1rem', borderRadius: '10px', border: '1px solid #e2e8f0'}}
                 />
               </div>
             )}
 
             {selectedStatus === 'RESOLVED' && (
               <div className="modal-field">
-                <label>Resolution Notes</label>
+                <label style={{fontWeight: '700', display: 'block', marginBottom: '0.5rem'}}>Resolution Summary</label>
                 <textarea 
                   value={resolutionNotes}
                   onChange={(e) => setResolutionNotes(e.target.value)}
-                  placeholder="What was the core solution?"
+                  placeholder="Summarize the solution provided..."
+                  style={{width: '100%', minHeight: '120px', padding: '1rem', borderRadius: '10px', border: '1px solid #e2e8f0'}}
                 />
               </div>
             )}
 
-            <div className="modal-actions">
+            <div className="modal-actions" style={{marginTop: '2rem', display: 'flex', gap: '1rem', justifyContent: 'flex-end'}}>
+              <button className="cancel-edit-btn" onClick={() => setShowStatusModal(false)}>Cancel</button>
               <button 
-                className="modal-cancel-btn" 
-                onClick={() => setShowStatusModal(false)}
-              >Cancel</button>
-              <button 
-                className="modal-submit-btn" 
+                className="save-edit-btn" 
                 onClick={handleUpdateStatus}
                 disabled={adminActionLoading}
               >
-                {adminActionLoading ? 'Updating...' : 'Confirm Update'}
+                {adminActionLoading ? 'Processing...' : 'Confirm Update'}
               </button>
             </div>
           </div>
