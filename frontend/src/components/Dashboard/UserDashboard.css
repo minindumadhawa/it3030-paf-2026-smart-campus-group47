@@ -130,21 +130,50 @@
   font-weight: 600;
 }
 
-.browse-btn {
-  background: var(--gradient-orange);
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(243, 112, 33, 0.2);
+/* Dashboard Action Buttons */
+.dashboard-btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
 }
 
-.browse-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(243, 112, 33, 0.35);
+.dash-action-btn {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.dash-action-btn.primary {
+  background: linear-gradient(135deg, #F37021 0%, #ff8c40 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(243, 112, 33, 0.25);
+}
+
+.dash-action-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(243, 112, 33, 0.35);
+}
+
+.dash-action-btn.secondary {
+  background: white;
+  border: 1.5px solid #F37021;
+  color: #F37021;
+}
+
+.dash-action-btn.secondary:hover {
+  background: #fffcf9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(243, 112, 33, 0.1);
 }
 
 .dashboard-loading {

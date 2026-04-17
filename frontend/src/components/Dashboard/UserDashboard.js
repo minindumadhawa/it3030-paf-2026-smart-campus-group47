@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { LayoutDashboard, PlusCircle, ArrowRight } from 'lucide-react';
 import './UserDashboard.css';
 
 const UserDashboard = () => {
@@ -58,20 +59,20 @@ const UserDashboard = () => {
           <div className="widget-card premium-glass">
             <h3>Maintenance & Incident</h3>
             <p>Report issues or request maintenance services on campus.</p>
-            <button
-              className="browse-btn"
-              style={{ marginTop: '15px', backgroundColor: '#f97316', width: '100%' }}
-              onClick={() => navigate('/tickets/my')}
-            >
-              My Tickets
-            </button>
-            <button
-              className="browse-btn"
-              style={{ marginTop: '10px', backgroundColor: 'transparent', border: '1px solid #f97316', color: '#f97316', width: '100%' }}
-              onClick={() => navigate('/tickets/create')}
-            >
-              + Submit New Ticket
-            </button>
+            <div className="dashboard-btn-group">
+              <button
+                className="dash-action-btn primary"
+                onClick={() => navigate('/tickets/my')}
+              >
+                <LayoutDashboard size={18} /> My Tickets
+              </button>
+              <button
+                className="dash-action-btn secondary"
+                onClick={() => navigate('/tickets/create')}
+              >
+                <PlusCircle size={18} /> Submit New Ticket
+              </button>
+            </div>
           </div>
 
           <div className="widget-card premium-glass">
