@@ -99,6 +99,12 @@ const MyTickets = () => {
                 
                 <p className="ticket-desc-preview">{ticket.description}</p>
                 
+                {ticket.locationOrResource && (
+                  <div style={{fontSize: '0.9rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '5px'}}>
+                    <LayoutDashboard size={14} /> {ticket.locationOrResource}
+                  </div>
+                )}
+                
                 <div className="card-footer">
                   <span className={`badge status-${ticket.status.toLowerCase().replace('_', '-')}`} style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
                     {statusIcons[ticket.status]} {ticket.status.replace('_', ' ')}
