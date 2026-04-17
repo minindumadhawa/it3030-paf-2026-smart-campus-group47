@@ -32,7 +32,25 @@ const CreateTicket = () => {
   }, [navigate]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    // Real-time Validation / Input Masking
+    if (name === 'description') {
+      const regex = /^[a-zA-Z0-9\s&,.]*$/;
+      if (!regex.test(value)) return; // Block illegal symbols
+    }
+    
+    if (name === 'locationOrResource') {
+      const regex = /^[a-zA-Z0-9\s.,]*$/;
+      if (!regex.test(value)) return; // Block illegal symbols
+    }
+
+    if (name === 'preferredContactDetails') {
+      const regex = /^[0-9]*$/;
+      if (!regex.test(value) || value.length > 10) return; // Block non-digits and > 10 chars
+    }
+
+    setFormData({ ...formData, [name]: value });
     setErrorMsg('');
   };
 
@@ -75,15 +93,33 @@ const CreateTicket = () => {
     const trimmedLoc = formData.locationOrResource.trim();
     const trimmedContact = formData.preferredContactDetails.trim();
 
+    // Regex Patterns
+    const descriptionRegex = /^[a-zA-Z0-9\s&,.]*$/;
+    const locationRegex = /^[a-zA-Z0-9\s.,]*$/;
+    const contactRegex = /^[0-9]{10}$/;
+
     if (!formData.category) { setErrorMsg('Please select a category.'); return; }
     if (!formData.priority) { setErrorMsg('Please select a priority.'); return; }
     
+    // Description Validation
     if (trimmedDesc.length < 10) {
-      setErrorMsg('Description is too short. Please provide at least 10 characters.');
+      setErrorMsg('Description is too short (min 10 chars).');
       return;
     }
-    if (trimmedDesc.length > 500) {
-      setErrorMsg('Description is too long. Please limit it to 500 characters.');
+    if (!descriptionRegex.test(trimmedDesc)) {
+      setErrorMsg('Description contains invalid symbols. Only & , . are allowed.');
+      return;
+    }
+
+    // Location Validation (optional but must be valid if provided)
+    if (trimmedLoc && !locationRegex.test(trimmedLoc)) {
+      setErrorMsg('Location contains invalid symbols. Only . , are allowed.');
+      return;
+    }
+
+    // Contact Validation (optional but must be 10 digits if provided)
+    if (trimmedContact && !contactRegex.test(trimmedContact)) {
+      setErrorMsg('Contact number must be exactly 10 digits (e.g., 0771234567).');
       return;
     }
 
