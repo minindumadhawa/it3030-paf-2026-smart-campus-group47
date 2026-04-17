@@ -44,6 +44,12 @@ const AdminDashboard = () => {
           >
             Manage Facilities & Resources Catalogue
           </button>
+          <button 
+            style={{marginTop: '20px', marginLeft: '10px', backgroundColor: '#38bdf8', color: '#0f172a', border: 'none', padding: '12px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold'}}
+            onClick={() => navigate('/admin/bookings')}
+          >
+            Review Booking Requests
+          </button>
         </header>
 
         <section className="admin-dashboard-widgets">

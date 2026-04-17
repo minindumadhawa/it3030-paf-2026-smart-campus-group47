@@ -11,7 +11,9 @@ import CreateTicket from "./components/Tickets/CreateTicket";
 import MyTickets from "./components/Tickets/MyTickets";
 import TicketDetails from "./components/Tickets/TicketDetails";
 import TicketManagement from "./components/Tickets/TicketManagement";
-
+import BookingForm from "./components/Bookings/BookingForm";
+import MyBookings from "./components/Bookings/MyBookings";
+import AdminBookingManagement from "./components/Bookings/AdminBookingManagement";
 function App(){
   return (
     <div>
@@ -29,6 +31,10 @@ function App(){
           <Route path="/tickets/my" element={<MyTickets></MyTickets>}/>
           <Route path="/tickets/:id" element={<TicketDetails></TicketDetails>}/>
           <Route path="/admin/tickets" element={<TicketManagement></TicketManagement>}/>
+          {/* Module: Bookings */}
+          <Route path="/user/bookings" element={<MyBookings></MyBookings>}/>
+          <Route path="/user/bookings/new/:resourceId" element={<BookingForm></BookingForm>}/>
+          <Route path="/admin/bookings" element={<AdminBookingManagement></AdminBookingManagement>}/>
         </Routes>
       </React.Fragment>
     </div>

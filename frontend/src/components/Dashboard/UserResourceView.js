@@ -95,6 +95,7 @@ const UserResourceView = () => {
                     <th>Capacity</th>
                     <th>Location</th>
                     <th>Available Times</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -110,6 +111,15 @@ const UserResourceView = () => {
                         <td>{res.capacity || 'N/A'}</td>
                         <td>{res.location}</td>
                         <td className="time-col">{res.availabilityWindows}</td>
+                        <td>
+                          <button 
+                            className="dash-action-btn primary" 
+                            style={{padding: '6px 12px', fontSize: '0.9rem'}}
+                            onClick={() => navigate(`/user/bookings/new/${res.id}`, { state: { resource: res } })}
+                          >
+                            Book
+                          </button>
+                        </td>
                       </tr>
                     ))
                   )}
