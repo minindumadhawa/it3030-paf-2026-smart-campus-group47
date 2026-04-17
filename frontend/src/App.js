@@ -14,7 +14,10 @@ import TicketManagement from "./components/Tickets/TicketManagement";
 import BookingForm from "./components/Bookings/BookingForm";
 import MyBookings from "./components/Bookings/MyBookings";
 import AdminBookingManagement from "./components/Bookings/AdminBookingManagement";
+import NotificationBell from './components/Notification/NotificationBell'
+import NotificationList from './components/Notification/NotificationList'
 function App(){
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
   return (
     <div>
       <React.Fragment>
@@ -35,6 +38,8 @@ function App(){
           <Route path="/user/bookings" element={<MyBookings></MyBookings>}/>
           <Route path="/user/bookings/new/:resourceId" element={<BookingForm></BookingForm>}/>
           <Route path="/admin/bookings" element={<AdminBookingManagement></AdminBookingManagement>}/>
+          {/* Module D - Notifications */}
+          <Route path="/notifications" element={<NotificationList userId={JSON.parse(localStorage.getItem('user') || 'null')?.id} />}/>
         </Routes>
       </React.Fragment>
     </div>
