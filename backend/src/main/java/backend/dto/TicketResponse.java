@@ -20,6 +20,7 @@ public class TicketResponse {
     private String resolutionNotes;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String assignedStaffName;
 
     // User info
     private Long userId;
@@ -42,6 +43,7 @@ public class TicketResponse {
         response.setResolutionNotes(ticket.getResolutionNotes());
         response.setCreatedAt(ticket.getCreatedAt());
         response.setUpdatedAt(ticket.getUpdatedAt());
+        response.setAssignedStaffName(ticket.getAssignedStaffName());
 
         if (ticket.getUser() != null) {
             response.setUserId(ticket.getUser().getId());
@@ -84,6 +86,9 @@ public class TicketResponse {
 
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
+    public String getAssignedStaffName() { return assignedStaffName; }
+    public void setAssignedStaffName(String assignedStaffName) { this.assignedStaffName = assignedStaffName; }
 
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }

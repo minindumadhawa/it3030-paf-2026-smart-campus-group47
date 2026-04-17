@@ -1,7 +1,6 @@
 package backend.service;
 
-import backend.dto.TicketRequest;
-import backend.dto.TicketResponse;
+import backend.dto.*;
 import backend.exception.TicketNotFoundException;
 import backend.model.Ticket;
 import backend.model.TicketStatus;
@@ -83,5 +82,55 @@ public class TicketService {
         }
 
         return TicketResponse.fromEntity(ticket);
+    }
+
+    // Assign a staff member to a ticket (Admin only)
+    public TicketResponse assignStaff(Long ticketId, TicketAssignRequest request) {
+        if (!"ADMIN".equalsIgnoreCase(request.getAdminRole())) {
+            throw new IllegalArgumentException("Access denied. Only Admins can assign staff.");
+        }
+
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new TicketNotFoundException("Ticket not found with id: " + ticketId));
+
+        ticket.setAssignedStaffName(request.getAssignedStaffName());
+        ticket.setStatus(TicketStatus.IN_PROGRESS); // Auto transition to IN_PROGRESS when assigned
+
+        Ticket updated = ticketRepository.save(ticket);
+        return TicketResponse.fromEntity(updated);
+    }
+
+    // Update ticket status (Admin only for now)
+    public TicketResponse updateStatus(Long ticketId, TicketStatusRequest request) {
+        if (!"ADMIN".equalsIgnoreCase(request.getRole())) {
+            throw new IllegalArgumentException("Access denied. Only Admins can update status for now.");
+        }
+
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new TicketNotFoundException("Ticket not found with id: " + ticketId));
+
+        ticket.setStatus(request.getStatus());
+        
+        if (request.getStatus() == TicketStatus.REJECTED) {
+            ticket.setRejectionReason(request.getRejectionReason());
+        }
+
+        Ticket updated = ticketRepository.save(ticket);
+        return TicketResponse.fromEntity(updated);
+    }
+
+    // Update resolution notes (Admin only for now)
+    public TicketResponse updateResolution(Long ticketId, TicketResolutionRequest request) {
+        if (!"ADMIN".equalsIgnoreCase(request.getRole())) {
+            throw new IllegalArgumentException("Access denied. Only Admins can update resolution notes.");
+        }
+
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new TicketNotFoundException("Ticket not found with id: " + ticketId));
+
+        ticket.setResolutionNotes(request.getResolutionNotes());
+        
+        Ticket updated = ticketRepository.save(ticket);
+        return TicketResponse.fromEntity(updated);
     }
 }

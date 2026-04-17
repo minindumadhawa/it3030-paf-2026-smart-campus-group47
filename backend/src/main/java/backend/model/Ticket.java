@@ -38,6 +38,9 @@ public class Ticket {
     @Column(length = 2000)
     private String resolutionNotes;
 
+    @Column
+    private String assignedStaffName;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -90,6 +93,9 @@ public class Ticket {
 
     public String getResolutionNotes() { return resolutionNotes; }
     public void setResolutionNotes(String resolutionNotes) { this.resolutionNotes = resolutionNotes; }
+
+    public String getAssignedStaffName() { return assignedStaffName; }
+    public void setAssignedStaffName(String assignedStaffName) { this.assignedStaffName = assignedStaffName; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

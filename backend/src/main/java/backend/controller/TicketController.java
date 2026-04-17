@@ -1,7 +1,6 @@
 package backend.controller;
 
-import backend.dto.TicketRequest;
-import backend.dto.TicketResponse;
+import backend.dto.*;
 import backend.exception.TicketNotFoundException;
 import backend.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,5 +68,26 @@ public class TicketController {
             error.put("error", e.getMessage());
             return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
         }
+    }
+
+    // Admin: Assign a staff member to a ticket
+    @PutMapping("/{id}/assign")
+    public ResponseEntity<TicketResponse> assignStaff(@PathVariable Long id, @RequestBody TicketAssignRequest request) {
+        TicketResponse updated = ticketService.assignStaff(id, request);
+        return ResponseEntity.ok(updated);
+    }
+
+    // Admin: Update ticket status
+    @PutMapping("/{id}/status")
+    public ResponseEntity<TicketResponse> updateStatus(@PathVariable Long id, @RequestBody TicketStatusRequest request) {
+        TicketResponse updated = ticketService.updateStatus(id, request);
+        return ResponseEntity.ok(updated);
+    }
+
+    // Admin: Update resolution notes
+    @PutMapping("/{id}/resolution")
+    public ResponseEntity<TicketResponse> updateResolution(@PathVariable Long id, @RequestBody TicketResolutionRequest request) {
+        TicketResponse updated = ticketService.updateResolution(id, request);
+        return ResponseEntity.ok(updated);
     }
 }
