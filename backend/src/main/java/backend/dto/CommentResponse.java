@@ -20,7 +20,10 @@ public class CommentResponse {
         response.setCreatedAt(comment.getCreatedAt());
         response.setUpdatedAt(comment.getUpdatedAt());
         
-        if (comment.getUser() != null) {
+        if (comment.getAdmin() != null) {
+            response.setUserId(comment.getAdmin().getId());
+            response.setUserFullName(comment.getAdmin().getFullName() + " (System Admin)");
+        } else if (comment.getUser() != null) {
             response.setUserId(comment.getUser().getId());
             response.setUserFullName(comment.getUser().getFullName());
         }

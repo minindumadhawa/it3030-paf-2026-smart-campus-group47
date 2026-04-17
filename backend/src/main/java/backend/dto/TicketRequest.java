@@ -6,6 +6,8 @@ import backend.model.TicketPriority;
 public class TicketRequest {
 
     private Long userId;
+    
+    private String role;
 
     private TicketCategory category;
 
@@ -21,6 +23,9 @@ public class TicketRequest {
 
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
+
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 
     public TicketCategory getCategory() { return category; }
     public void setCategory(TicketCategory category) { this.category = category; }

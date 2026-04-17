@@ -108,7 +108,7 @@ const TicketManagement = () => {
   return (
     <div className="admin-mgmt-container">
       <nav className="admin-mgmt-nav">
-        <div className="nav-logo">Smart Campus <span>| Admin Portal</span></div>
+        <div className="nav-logo">Ticketing & Maintenance <span>Admin</span></div>
         <div className="nav-links">
           <button className="nav-link-btn" onClick={() => navigate('/admin-dashboard')}>Main Dashboard</button>
           <button className="logout-btn" onClick={() => { localStorage.removeItem('user'); navigate('/login'); }}>
@@ -230,7 +230,7 @@ const TicketManagement = () => {
                         </span>
                       </td>
                       <td>
-                        <span className={`stat-pill pill-${ticket.status.toLowerCase().replace('_', '-')}`}>
+                        <span className={`pill-status status-${ticket.status.toLowerCase().replace('_', '-')}`}>
                           {ticket.status.replace('_', ' ')}
                         </span>
                       </td>
@@ -238,7 +238,7 @@ const TicketManagement = () => {
                       <td className="date-col">{formatDate(ticket.createdAt)}</td>
                       <td>
                         <button className="manage-row-btn" onClick={() => navigate(`/tickets/${ticket.id}`)}>
-                          <ChevronRight size={18} />
+                          Manage <ChevronRight size={16} />
                         </button>
                       </td>
                     </tr>
@@ -248,7 +248,6 @@ const TicketManagement = () => {
             )}
           </div>
 
-          {/* Footer / Pagination UI */}
           <div className="mgmt-footer">
             <span className="showing-text">Showing {filteredTickets.length} of {tickets.length} records</span>
             <div className="pagination-ctrl">

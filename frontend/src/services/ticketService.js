@@ -69,8 +69,8 @@ const ticketService = {
       body: JSON.stringify({
         status: status,
         rejectionReason: rejectionReason,
-        adminUserId: adminId,
-        adminRole: adminRole
+        userId: adminId,
+        role: adminRole
       }),
     });
     if (!response.ok) {
@@ -87,8 +87,8 @@ const ticketService = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         resolutionNotes: notes,
-        adminUserId: adminId,
-        adminRole: adminRole
+        userId: adminId,
+        role: adminRole
       }),
     });
     if (!response.ok) {

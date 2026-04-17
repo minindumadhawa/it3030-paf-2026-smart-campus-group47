@@ -178,29 +178,46 @@
     font-size: 0.9rem;
   }
   
-  .status-buttons {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
+  /* Status Dropdown - New Premium Style */
+  .status-dropdown-wrapper {
+    position: relative;
+    width: 100%;
   }
   
-  .status-buttons button {
-    padding: 0.75rem;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-    background: #fff;
-    font-weight: 600;
+  .admin-status-select {
+    width: 100%;
+    padding: 0.85rem 1.25rem;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    background: #ffffff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #1e293b;
     cursor: pointer;
-    transition: all 0.2s;
-    text-align: left;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    outline: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    appearance: none; /* Custom arrow style */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.25rem;
   }
   
-  .btn-in-progress:hover { border-color: #f97316; color: #f97316; background: #fff7ed; }
-  .btn-resolved:hover { border-color: #22c55e; color: #22c55e; background: #f0fdf4; }
-  .btn-rejected:hover { border-color: #ef4444; color: #ef4444; background: #fef2f2; }
+  .admin-status-select:hover {
+    border-color: #F37021;
+    box-shadow: 0 4px 12px rgba(243, 112, 33, 0.1);
+  }
+  
+  .admin-status-select:focus {
+    border-color: #F37021;
+    box-shadow: 0 0 0 4px rgba(243, 112, 33, 0.1);
+  }
+  
+  /* Color Coding for Select States */
+  .admin-status-select.status-open { background-color: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+  .admin-status-select.status-in-progress { background-color: #fff7ed; border-color: #fed7aa; color: #c2410c; }
+  .admin-status-select.status-resolved { background-color: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
+  .admin-status-select.status-rejected { background-color: #fef2f2; border-color: #fecaca; color: #991b1b; }
   
   /* Priority Color Modifiers */
   .priority-high { color: #ef4444; }
@@ -257,4 +274,81 @@
     .admin-sidebar {
       position: static;
     }
+  }
+
+  /* Modal Overlay & Content */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .modal-content {
+    background: white;
+    width: 100%;
+    max-width: 500px;
+    padding: 2.5rem;
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .modal-content h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+  }
+
+  .modal-actions button {
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .cancel-edit-btn {
+    background: #f1f5f9;
+    border: none;
+    color: #64748b;
+  }
+
+  .cancel-edit-btn:hover {
+    background: #e2e8f0;
+    color: #475569;
+  }
+
+  .save-edit-btn {
+    background: #F37021;
+    border: none;
+    color: white;
+    box-shadow: 0 4px 12px rgba(243, 112, 33, 0.2);
+  }
+
+  .save-edit-btn:hover {
+    background: #e65e00;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(243, 112, 33, 0.3);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
   }

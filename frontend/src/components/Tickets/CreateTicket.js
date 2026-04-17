@@ -128,6 +128,7 @@ const CreateTicket = () => {
       // 1. Create the Ticket
       const newTicket = await ticketService.createTicket({
         userId: user.id,
+        role: user.role,
         category: formData.category,
         description: trimmedDesc,
         priority: formData.priority,
@@ -157,7 +158,7 @@ const CreateTicket = () => {
       <nav className="ticket-nav">
         <div className="nav-logo">SLIIT Smart Campus</div>
         <div className="nav-links">
-          <button className="nav-link-btn" onClick={() => navigate('/dashboard')}>Dashboard</button>
+          <button className="nav-link-btn" onClick={() => navigate(user.role === 'ADMIN' ? '/admin-dashboard' : '/dashboard')}>Dashboard</button>
           <button className="nav-link-btn" onClick={() => navigate('/tickets/my')}>My Tickets</button>
           <button className="logout-btn" onClick={() => { localStorage.removeItem('user'); navigate('/login'); }}>
             <LogOut size={16} style={{marginRight: '5px'}}/> Logout

@@ -101,7 +101,7 @@ const MyTickets = () => {
       <nav className="ticket-nav">
         <div className="nav-logo">SLIIT Smart Campus</div>
         <div className="nav-links">
-          <button className="nav-link-btn" onClick={() => navigate('/dashboard')}>Dashboard</button>
+          <button className="nav-link-btn" onClick={() => navigate(user.role === 'ADMIN' ? '/admin-dashboard' : '/dashboard')}>Dashboard</button>
           <button className="logout-btn" onClick={() => { localStorage.removeItem('user'); navigate('/login'); }}>
             <LogOut size={16} /> Logout
           </button>

@@ -10,7 +10,12 @@ const UserDashboard = () => {
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const parsedUser = JSON.parse(storedUser);
+      if (parsedUser.role === 'ADMIN') {
+        navigate('/admin-dashboard');
+      } else {
+        setUser(parsedUser);
+      }
     } else {
       navigate('/login');
     }

@@ -34,6 +34,7 @@ const TicketDetails = () => {
   const [rejectionReason, setRejectionReason] = useState('');
   const [resolutionNotes, setResolutionNotes] = useState('');
   const [adminActionLoading, setAdminActionLoading] = useState(false);
+  const [localStatus, setLocalStatus] = useState('');
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -52,6 +53,7 @@ const TicketDetails = () => {
       const ticketData = await ticketService.getTicketById(ticketId, userId, role);
       setTicket(ticketData);
       setStaffName(ticketData.assignedStaffName || '');
+      setLocalStatus(ticketData.status);
     } catch (err) {
       setErrorMsg(err.message || 'Failed to load details.');
     } finally {
@@ -84,31 +86,73 @@ const TicketDetails = () => {
     const trimmedReason = rejectionReason.trim();
 
     if (selectedStatus === 'RESOLVED' && trimmedNotes.length < 10) {
-      alert('Please provide detailed resolution notes (minimum 10 characters).');
+      alert('⚠️ Resolution notes are too short. Please provide more detail (min 10 chars).');
       return;
     }
 
     if (selectedStatus === 'REJECTED' && trimmedReason.length < 10) {
-      alert('Please provide a formal rejection reason (minimum 10 characters).');
+      alert('⚠️ Rejection reason is too short. Please provide more detail (min 10 chars).');
       return;
     }
 
     setAdminActionLoading(true);
     try {
+      // 1. Update Status
       await ticketService.updateStatus(id, user.id, user.role, selectedStatus, trimmedReason);
       
+      // 2. Update Resolution if applicable
       if (selectedStatus === 'RESOLVED') {
         await ticketService.updateResolution(id, user.id, user.role, trimmedNotes);
       }
       
-      alert('Status updated successfully!');
+      // 3. Post formal comment
+      if (selectedStatus === 'REJECTED' || selectedStatus === 'RESOLVED') {
+        const finalNote = selectedStatus === 'REJECTED' ? trimmedReason : trimmedNotes;
+        await commentService.addComment(id, {
+          userId: user.id,
+          role: user.role,
+          content: `🔔 [${selectedStatus}] ${finalNote}`
+        });
+      }
+      
+      alert(`Success: Ticket status changed to ${selectedStatus}`);
       setShowStatusModal(false);
+      setResolutionNotes('');
+      setRejectionReason('');
       fetchTicketData(id, user.id, user.role);
     } catch (err) {
-      alert(err.message);
+      alert(`Error: ${err.message}`);
     } finally {
       setAdminActionLoading(false);
     }
+  };
+
+  const handleQuickStatusUpdate = async (newStatus) => {
+    setAdminActionLoading(true);
+    try {
+      await ticketService.updateStatus(id, user.id, user.role, newStatus, '');
+      
+      // Post a simple comment for progress tracking
+      if (newStatus === 'IN_PROGRESS') {
+        await commentService.addComment(id, {
+          userId: user.id,
+          role: user.role,
+          content: `⚙️ Ticket is now IN PROGRESS.`
+        });
+      }
+
+      alert(`Success: Ticket status changed to ${newStatus}`);
+      fetchTicketData(id, user.id, user.role);
+    } catch (err) {
+      alert(`Error: ${err.message}`);
+    } finally {
+      setAdminActionLoading(false);
+    }
+  };
+
+  const cancelUpdate = () => {
+    setLocalStatus(ticket.status);
+    setShowStatusModal(false);
   };
 
   const formatDate = (dateStr) => {
@@ -126,8 +170,10 @@ const TicketDetails = () => {
       <nav className="ticket-nav">
         <div className="nav-logo">SLIIT Smart Campus</div>
         <div className="nav-links">
-          <button className="nav-link-btn" onClick={() => navigate('/dashboard')}>Dashboard</button>
-          <button className="nav-link-btn" onClick={() => navigate('/tickets/my')}>My Tickets</button>
+          <button className="nav-link-btn" onClick={() => navigate(user.role === 'ADMIN' ? '/admin-dashboard' : '/dashboard')}>Dashboard</button>
+          <button className="nav-link-btn" onClick={() => navigate(user.role === 'ADMIN' ? '/admin/tickets' : '/tickets/my')}>
+            {user.role === 'ADMIN' ? 'All Tickets' : 'My Tickets'}
+          </button>
           <button className="logout-btn" onClick={() => { localStorage.removeItem('user'); navigate('/login'); }}>
             <LogOut size={16} style={{marginRight: '5px'}}/> Logout
           </button>
@@ -135,8 +181,8 @@ const TicketDetails = () => {
       </nav>
 
       <main className="details-main">
-        <Link to="/tickets/my" className="back-link">
-          <ChevronLeft size={20} /> Back to My Tickets
+        <Link to={user.role === 'ADMIN' ? '/admin/tickets' : '/tickets/my'} className="back-link">
+          <ChevronLeft size={20} /> Back to {user.role === 'ADMIN' ? 'Tickets Portal' : 'My Tickets'}
         </Link>
 
         {loading ? (
@@ -276,17 +322,33 @@ const TicketDetails = () => {
                   </div>
 
                   <div className="admin-section">
-                    <label>Lifecycle Actions</label>
-                    <div className="status-buttons">
-                      <button className="btn-in-progress" onClick={() => { setSelectedStatus('IN_PROGRESS'); setShowStatusModal(true); }}>
-                        Set In Progress <ArrowRight size={16} />
-                      </button>
-                      <button className="btn-resolved" onClick={() => { setSelectedStatus('RESOLVED'); setShowStatusModal(true); }}>
-                        Mark Resolved <CheckCircle size={16} />
-                      </button>
-                      <button className="btn-rejected" onClick={() => { setSelectedStatus('REJECTED'); setShowStatusModal(true); }}>
-                        Reject Case <XCircle size={16} />
-                      </button>
+                    <label>Update Lifecycle Status</label>
+                    <div className="status-dropdown-wrapper">
+                      <select 
+                        className={`admin-status-select status-${localStatus.toLowerCase().replace('_', '-')}`}
+                        value={localStatus}
+                        onChange={(e) => {
+                          const newStatus = e.target.value;
+                          setLocalStatus(newStatus);
+                          
+                          setSelectedStatus(newStatus);
+                          if (newStatus === 'RESOLVED' || newStatus === 'REJECTED') {
+                            setShowStatusModal(true);
+                          } else {
+                            if (window.confirm(`Change status to ${newStatus.replace('_', ' ')}?`)) {
+                              handleQuickStatusUpdate(newStatus);
+                            } else {
+                              setLocalStatus(ticket.status);
+                            }
+                          }
+                        }}
+                        disabled={adminActionLoading}
+                      >
+                        <option value="OPEN">Open</option>
+                        <option value="IN_PROGRESS">In Progress</option>
+                        <option value="RESOLVED">Resolved</option>
+                        <option value="REJECTED">Rejected</option>
+                      </select>
                     </div>
                   </div>
 
@@ -333,7 +395,7 @@ const TicketDetails = () => {
             )}
 
             <div className="modal-actions" style={{marginTop: '2rem', display: 'flex', gap: '1rem', justifyContent: 'flex-end'}}>
-              <button className="cancel-edit-btn" onClick={() => setShowStatusModal(false)}>Cancel</button>
+              <button className="cancel-edit-btn" onClick={cancelUpdate}>Cancel</button>
               <button 
                 className="save-edit-btn" 
                 onClick={handleUpdateStatus}

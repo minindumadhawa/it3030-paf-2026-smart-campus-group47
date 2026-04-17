@@ -27,8 +27,12 @@ public class Comment {
 
     // A comment belongs to one user
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = true)
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "admin_id", nullable = true)
+    private Admin admin;
 
     @PrePersist
     protected void onCreate() {
@@ -61,4 +65,7 @@ public class Comment {
 
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
+
+    public Admin getAdmin() { return admin; }
+    public void setAdmin(Admin admin) { this.admin = admin; }
 }

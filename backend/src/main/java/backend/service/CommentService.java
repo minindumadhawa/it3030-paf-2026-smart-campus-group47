@@ -8,6 +8,8 @@ import backend.exception.ValidationException;
 import backend.model.Comment;
 import backend.model.Ticket;
 import backend.model.User;
+import backend.model.Admin;
+import backend.repository.AdminRepository;
 import backend.repository.CommentRepository;
 import backend.repository.TicketRepository;
 import backend.repository.UserRepository;
@@ -29,6 +31,9 @@ public class CommentService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private AdminRepository adminRepository;
+
     public CommentResponse addComment(Long ticketId, CommentRequest request) {
         if (request.getContent() == null || request.getContent().trim().isEmpty()) {
             throw new ValidationException("Comment content cannot be empty.");
@@ -37,13 +42,21 @@ public class CommentService {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new TicketNotFoundException("Ticket not found with id: " + ticketId));
 
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new TicketNotFoundException("User not found with id: " + request.getUserId()));
-
         Comment comment = new Comment();
         comment.setContent(request.getContent().trim());
         comment.setTicket(ticket);
-        comment.setUser(user);
+        
+        if ("ADMIN".equalsIgnoreCase(request.getRole())) {
+            Admin admin = adminRepository.findById(request.getUserId())
+                    .orElseThrow(() -> new TicketNotFoundException("Admin not found with id: " + request.getUserId()));
+            comment.setAdmin(admin);
+            // Workaround for NOT NULL database constraint not updating automatically
+            comment.setUser(ticket.getUser());
+        } else {
+            User user = userRepository.findById(request.getUserId())
+                    .orElseThrow(() -> new TicketNotFoundException("User not found with id: " + request.getUserId()));
+            comment.setUser(user);
+        }
 
         return CommentResponse.fromEntity(commentRepository.save(comment));
     }
@@ -62,8 +75,14 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new TicketNotFoundException("Comment not found with id: " + commentId));
 
-        if (!comment.getUser().getId().equals(request.getUserId()) && !"ADMIN".equalsIgnoreCase(request.getRole())) {
-            throw new UnauthorizedException("Access denied. You can only update your own comments.");
+        if ("ADMIN".equalsIgnoreCase(request.getRole())) {
+            if (comment.getAdmin() == null || !comment.getAdmin().getId().equals(request.getUserId())) {
+                throw new UnauthorizedException("Access denied.");
+            }
+        } else {
+            if (comment.getUser() == null || !comment.getUser().getId().equals(request.getUserId())) {
+                throw new UnauthorizedException("Access denied. You can only update your own comments.");
+            }
         }
 
         comment.setContent(request.getContent().trim());
@@ -74,8 +93,10 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new TicketNotFoundException("Comment not found with id: " + commentId));
 
-        if (!comment.getUser().getId().equals(userId) && !"ADMIN".equalsIgnoreCase(role)) {
-            throw new UnauthorizedException("Access denied. You can only delete your own comments.");
+        if (!"ADMIN".equalsIgnoreCase(role)) {
+            if (comment.getUser() == null || !comment.getUser().getId().equals(userId)) {
+                throw new UnauthorizedException("Access denied. You can only delete your own comments.");
+            }
         }
 
         commentRepository.delete(comment);
