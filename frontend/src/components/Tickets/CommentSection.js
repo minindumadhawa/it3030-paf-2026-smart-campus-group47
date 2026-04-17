@@ -41,7 +41,12 @@ const CommentSection = ({ ticketId }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!newComment.trim()) return;
+        const trimmedContent = newComment.trim();
+
+        if (trimmedContent.length < 5) {
+            setMessage({ type: 'error', text: 'Comment is too short. Please type at least 5 characters.' });
+            return;
+        }
 
         if (!user) {
             setMessage({ type: 'error', text: 'Please log in to post a comment.' });
@@ -55,7 +60,7 @@ const CommentSection = ({ ticketId }) => {
             const commentData = {
                 userId: user.id,
                 role: user.role,
-                content: newComment.trim()
+                content: trimmedContent
             };
 
             await commentService.addComment(ticketId, commentData);
@@ -130,10 +135,13 @@ const CommentSection = ({ ticketId }) => {
 
             <div className="comments-list">
                 {loading ? (
-                    <p style={{ textAlign: 'center', color: '#64748b' }}>Loading discussion...</p>
+                    <div className="loading-wrapper" style={{padding: '2rem 1rem'}}>
+                        <div className="spinner" style={{width: '32px', height: '32px'}}></div>
+                    </div>
                 ) : comments.length === 0 ? (
-                    <div className="no-comments-msg">
-                        No comments yet. Start the conversation!
+                    <div className="empty-state-base" style={{padding: '3rem 1rem', background: 'transparent', borderStyle: 'solid'}}>
+                        <div style={{opacity: 0.3, color: 'var(--text-muted)'}}><MessageSquare size={32} /></div>
+                        <p style={{marginTop: '0.5rem', fontSize: '0.9rem'}}>No conversation here yet. Start the discussion!</p>
                     </div>
                 ) : (
                     comments.map(comment => (

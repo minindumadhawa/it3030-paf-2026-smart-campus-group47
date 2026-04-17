@@ -80,16 +80,23 @@ const MyTickets = () => {
         </div>
 
         {loading ? (
-          <div className="loading-spinner">Loading your requests...</div>
+          <div className="loading-wrapper">
+            <div className="spinner"></div>
+            <p>Loading your requests...</p>
+          </div>
         ) : errorMsg ? (
-          <div className="alert-error">{errorMsg}</div>
+          <div className="alert-error">
+            <AlertCircle size={20} /> {errorMsg}
+          </div>
         ) : tickets.length === 0 ? (
-          <div className="empty-tickets">
-            <LayoutDashboard size={64} style={{marginBottom: '1.5rem', opacity: 0.2}}/>
+          <div className="empty-state-base">
+            <div style={{background: 'var(--primary-orange-light)', padding: '2rem', borderRadius: '50%', color: 'var(--primary-orange)'}}>
+              <LayoutDashboard size={48} />
+            </div>
             <h3>No requests yet</h3>
-            <p>Need help with something? Create your first ticket now.</p>
-            <button className="view-btn" onClick={() => navigate('/tickets/create')} style={{maxWidth: '240px', margin: '2rem auto 0', background: '#0b2239', color: 'white'}}>
-              Submit a Request
+            <p>Need help with something? Create your first ticket now and our team will get right on it.</p>
+            <button className="submit-btn" onClick={() => navigate('/tickets/create')} style={{marginTop: '1rem'}}>
+              <PlusCircle size={20} /> Submit a Request
             </button>
           </div>
         ) : (

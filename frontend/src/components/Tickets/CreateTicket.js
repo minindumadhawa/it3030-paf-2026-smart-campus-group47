@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Wrench, MapPin, Phone, AlertCircle, ChevronLeft, LogOut, Image as ImageIcon, X, Upload } from 'lucide-react';
+import { Wrench, MapPin, Phone, AlertCircle, ChevronLeft, LogOut, Image as ImageIcon, X, Upload, CheckCircle } from 'lucide-react';
 import ticketService from '../../services/ticketService';
 import './CreateTicket.css';
 
@@ -71,12 +71,21 @@ const CreateTicket = () => {
     setErrorMsg('');
     setSuccessMsg('');
 
+    const trimmedDesc = formData.description.trim();
+    const trimmedLoc = formData.locationOrResource.trim();
+    const trimmedContact = formData.preferredContactDetails.trim();
+
     if (!formData.category) { setErrorMsg('Please select a category.'); return; }
-    if (!formData.description.trim() || formData.description.trim().length < 10) {
-      setErrorMsg('Description must be at least 10 characters.');
+    if (!formData.priority) { setErrorMsg('Please select a priority.'); return; }
+    
+    if (trimmedDesc.length < 10) {
+      setErrorMsg('Description is too short. Please provide at least 10 characters.');
       return;
     }
-    if (!formData.priority) { setErrorMsg('Please select a priority.'); return; }
+    if (trimmedDesc.length > 500) {
+      setErrorMsg('Description is too long. Please limit it to 500 characters.');
+      return;
+    }
 
     setLoading(true);
     try {
@@ -84,10 +93,10 @@ const CreateTicket = () => {
       const newTicket = await ticketService.createTicket({
         userId: user.id,
         category: formData.category,
-        description: formData.description.trim(),
+        description: trimmedDesc,
         priority: formData.priority,
-        locationOrResource: formData.locationOrResource,
-        preferredContactDetails: formData.preferredContactDetails,
+        locationOrResource: trimmedLoc,
+        preferredContactDetails: trimmedContact,
       });
 
       // 2. Upload Images if any
@@ -134,8 +143,8 @@ const CreateTicket = () => {
             <p>Report an issue or maintenance request on campus</p>
           </div>
 
-          {successMsg && <div className="alert-success">{successMsg}</div>}
-          {errorMsg && <div className="alert-error"><AlertCircle size={18} style={{marginRight: '8px'}}/> {errorMsg}</div>}
+          {successMsg && <div className="alert-success"><CheckCircle size={20} /> {successMsg}</div>}
+          {errorMsg && <div className="alert-error"><AlertCircle size={20} /> {errorMsg}</div>}
 
           <form onSubmit={handleSubmit} className="ticket-form">
             <div className="form-group">

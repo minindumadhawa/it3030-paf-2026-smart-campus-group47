@@ -61,9 +61,15 @@ const TicketDetails = () => {
 
   const handleAssign = async (e) => {
     e.preventDefault();
+    const trimmedStaff = staffName.trim();
+    if (!trimmedStaff) {
+      alert('Please enter a technician or department name.');
+      return;
+    }
+
     setAdminActionLoading(true);
     try {
-      await ticketService.assignStaff(id, user.id, user.role, staffName);
+      await ticketService.assignStaff(id, user.id, user.role, trimmedStaff);
       alert('Staff assigned successfully!');
       fetchTicketData(id, user.id, user.role);
     } catch (err) {
@@ -74,12 +80,25 @@ const TicketDetails = () => {
   };
 
   const handleUpdateStatus = async () => {
+    const trimmedNotes = resolutionNotes.trim();
+    const trimmedReason = rejectionReason.trim();
+
+    if (selectedStatus === 'RESOLVED' && trimmedNotes.length < 10) {
+      alert('Please provide detailed resolution notes (minimum 10 characters).');
+      return;
+    }
+
+    if (selectedStatus === 'REJECTED' && trimmedReason.length < 10) {
+      alert('Please provide a formal rejection reason (minimum 10 characters).');
+      return;
+    }
+
     setAdminActionLoading(true);
     try {
-      await ticketService.updateStatus(id, user.id, user.role, selectedStatus, rejectionReason);
+      await ticketService.updateStatus(id, user.id, user.role, selectedStatus, trimmedReason);
       
-      if (selectedStatus === 'RESOLVED' && resolutionNotes) {
-        await ticketService.updateResolution(id, user.id, user.role, resolutionNotes);
+      if (selectedStatus === 'RESOLVED') {
+        await ticketService.updateResolution(id, user.id, user.role, trimmedNotes);
       }
       
       alert('Status updated successfully!');
@@ -121,9 +140,14 @@ const TicketDetails = () => {
         </Link>
 
         {loading ? (
-          <div className="loading-spinner">Fetching record details...</div>
+          <div className="loading-wrapper">
+            <div className="spinner"></div>
+            <p>Fetching record details...</p>
+          </div>
         ) : errorMsg ? (
-          <div className="alert-error">{errorMsg}</div>
+          <div className="alert-error">
+            <AlertCircle size={20} /> {errorMsg}
+          </div>
         ) : (
           <div className="detail-layout">
             <div className="detail-left-col">
