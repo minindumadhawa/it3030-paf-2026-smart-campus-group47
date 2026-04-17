@@ -25,6 +25,34 @@ const commentService = {
             throw new Error(error.error || 'Failed to post comment');
         }
         return response.json();
+    },
+
+    // Update an existing comment
+    updateComment: async (commentId, commentData) => {
+        const response = await fetch(`${API_URL}/comments/${commentId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(commentData),
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to update comment');
+        }
+        return response.json();
+    },
+
+    // Delete a comment
+    deleteComment: async (commentId, userId, role) => {
+        const response = await fetch(`${API_URL}/comments/${commentId}?userId=${userId}&role=${role}`, {
+            method: 'DELETE',
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to delete comment');
+        }
+        return true;
     }
 };
 

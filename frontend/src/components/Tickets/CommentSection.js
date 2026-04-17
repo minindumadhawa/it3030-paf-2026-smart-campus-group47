@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, Send, Clock } from 'lucide-react';
+import { MessageSquare, Send, Clock, Edit2, Trash2, X, Check } from 'lucide-react';
 import commentService from '../../services/commentService';
 import './CommentSection.css';
 
@@ -10,6 +10,10 @@ const CommentSection = ({ ticketId }) => {
     const [actionLoading, setActionLoading] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
     const [user, setUser] = useState(null);
+
+    // Editing state
+    const [editingCommentId, setEditingCommentId] = useState(null);
+    const [editContent, setEditContent] = useState('');
 
     useEffect(() => {
         // Get user from localStorage
@@ -57,17 +61,52 @@ const CommentSection = ({ ticketId }) => {
             await commentService.addComment(ticketId, commentData);
             setNewComment('');
             setMessage({ type: 'success', text: 'Comment added successfully!' });
-            
-            // Refresh list
             fetchComments();
-            
-            // Clear success message after 3 seconds
             setTimeout(() => setMessage({ type: '', text: '' }), 3000);
         } catch (err) {
             setMessage({ type: 'error', text: err.message || 'Failed to post comment.' });
         } finally {
             setActionLoading(false);
         }
+    };
+
+    const handleUpdate = async (commentId) => {
+        if (!editContent.trim()) return;
+        
+        setActionLoading(true);
+        try {
+            await commentService.updateComment(commentId, {
+                userId: user.id,
+                role: user.role,
+                content: editContent.trim()
+            });
+            setEditingCommentId(null);
+            fetchComments();
+            setMessage({ type: 'success', text: 'Comment updated!' });
+            setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+        } catch (err) {
+            alert(err.message);
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleDelete = async (commentId) => {
+        if (!window.confirm('Are you sure you want to delete this comment?')) return;
+
+        try {
+            await commentService.deleteComment(commentId, user.id, user.role);
+            setComments(comments.filter(c => c.id !== commentId));
+            setMessage({ type: 'success', text: 'Comment deleted.' });
+            setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+        } catch (err) {
+            alert(err.message);
+        }
+    };
+
+    const startEditing = (comment) => {
+        setEditingCommentId(comment.id);
+        setEditContent(comment.content);
     };
 
     const formatDate = (dateStr) => {
@@ -83,14 +122,12 @@ const CommentSection = ({ ticketId }) => {
         <div className="comment-section-container">
             <h3><MessageSquare size={22} className="icon-orange" /> Discussion & Updates</h3>
 
-            {/* Success/Error Alerts */}
             {message.text && (
                 <div className={`comment-alert alert-${message.type}`}>
                     {message.text}
                 </div>
             )}
 
-            {/* Comments List */}
             <div className="comments-list">
                 {loading ? (
                     <p style={{ textAlign: 'center', color: '#64748b' }}>Loading discussion...</p>
@@ -108,13 +145,43 @@ const CommentSection = ({ ticketId }) => {
                                     {formatDate(comment.createdAt)}
                                 </span>
                             </div>
-                            <p className="comment-text">{comment.content}</p>
+
+                            {editingCommentId === comment.id ? (
+                                <div className="edit-comment-form">
+                                    <textarea
+                                        value={editContent}
+                                        onChange={(e) => setEditContent(e.target.value)}
+                                        autoFocus
+                                    />
+                                    <div className="edit-actions">
+                                        <button className="cancel-edit-btn" onClick={() => setEditingCommentId(null)}>
+                                            <X size={16} /> Cancel
+                                        </button>
+                                        <button className="save-edit-btn" onClick={() => handleUpdate(comment.id)} disabled={actionLoading}>
+                                            <Check size={16} /> Save
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <>
+                                    <p className="comment-text">{comment.content}</p>
+                                    {(user && (user.id === comment.userId || user.role === 'ADMIN')) && (
+                                        <div className="comment-actions">
+                                            <button className="action-btn edit-btn" onClick={() => startEditing(comment)}>
+                                                <Edit2 size={14} /> Edit
+                                            </button>
+                                            <button className="action-btn delete-btn" onClick={() => handleDelete(comment.id)}>
+                                                <Trash2 size={14} /> Delete
+                                            </button>
+                                        </div>
+                                    )}
+                                </>
+                            )}
                         </div>
                     ))
                 )}
             </div>
 
-            {/* Add Comment Form */}
             <form className="add-comment-form" onSubmit={handleSubmit}>
                 <textarea
                     placeholder="Type your comment or update here..."
@@ -128,10 +195,7 @@ const CommentSection = ({ ticketId }) => {
                     disabled={actionLoading || !newComment.trim()}
                 >
                     {actionLoading ? 'Posting...' : (
-                        <>
-                            <Send size={18} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-                            Post Comment
-                        </>
+                        <><Send size={18} style={{ marginRight: '8px', verticalAlign: 'middle' }} /> Post Comment</>
                     )}
                 </button>
             </form>
