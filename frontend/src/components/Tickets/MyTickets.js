@@ -171,6 +171,10 @@ const MyTickets = () => {
                 <option value="ALL">All Categories</option>
                 <option value="MAINTENANCE">Maintenance</option>
                 <option value="IT_SUPPORT">IT Support</option>
+                <option value="IT_EQUIPMENT">IT Equipment</option>
+                <option value="FURNITURE">Furniture</option>
+                <option value="ELECTRICAL">Electrical</option>
+                <option value="PLUMBING">Plumbing</option>
                 <option value="CLEANING">Cleaning</option>
                 <option value="FACILITY">Facility</option>
               </select>
