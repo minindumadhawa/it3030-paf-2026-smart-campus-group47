@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -20,11 +22,17 @@ public class CommentController {
 
     // POST /api/tickets/{ticketId}/comments
     @PostMapping("/tickets/{ticketId}/comments")
-    public ResponseEntity<CommentResponse> addComment(
+    public ResponseEntity<?> addComment(
             @PathVariable Long ticketId,
             @RequestBody CommentRequest request) {
-        CommentResponse response = commentService.addComment(ticketId, request);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        try {
+            CommentResponse response = commentService.addComment(ticketId, request);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
     }
 
     // GET /api/tickets/{ticketId}/comments
@@ -36,20 +44,32 @@ public class CommentController {
 
     // PUT /api/comments/{commentId}
     @PutMapping("/comments/{commentId}")
-    public ResponseEntity<CommentResponse> updateComment(
+    public ResponseEntity<?> updateComment(
             @PathVariable Long commentId,
             @RequestBody CommentRequest request) {
-        CommentResponse response = commentService.updateComment(commentId, request);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        try {
+            CommentResponse response = commentService.updateComment(commentId, request);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+        }
     }
 
     // DELETE /api/comments/{commentId}
     @DeleteMapping("/comments/{commentId}")
-    public ResponseEntity<Void> deleteComment(
+    public ResponseEntity<?> deleteComment(
             @PathVariable Long commentId,
             @RequestParam Long userId,
             @RequestParam String role) {
-        commentService.deleteComment(commentId, userId, role);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        try {
+            commentService.deleteComment(commentId, userId, role);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+        }
     }
 }
