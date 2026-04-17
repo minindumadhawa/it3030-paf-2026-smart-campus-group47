@@ -46,6 +46,13 @@ const UserDashboard = () => {
           >
             Browse Available Resources
           </button>
+          <button
+            className="browse-btn"
+            style={{ marginTop: '20px', marginLeft: '10px', backgroundColor: '#10b981', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
+            onClick={() => navigate('/user/bookings')}
+          >
+            Manage My Bookings
+          </button>
         </header>
 
         <section className="dashboard-widgets">
