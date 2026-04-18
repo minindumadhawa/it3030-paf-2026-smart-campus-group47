@@ -51,7 +51,7 @@ public class TicketService {
         ticket.setPreferredContactDetails(request.getPreferredContactDetails());
 
         Ticket saved = ticketRepository.save(ticket);
-        return TicketResponse.fromEntity(saved);
+        return mapToResponse(saved);
     }
 
     public List<TicketResponse> getMyTickets(Long userId) {
@@ -73,9 +73,7 @@ public class TicketService {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new TicketNotFoundException("Ticket not found with id: " + ticketId));
 
-        if ("ADMIN".equalsIgnoreCase(role)) return TicketResponse.fromEntity(ticket);
-
-        if (!ticket.getUser().getId().equals(requestingUserId)) {
+        if (!"ADMIN".equalsIgnoreCase(role) && !ticket.getUser().getId().equals(requestingUserId)) {
             throw new UnauthorizedException("Access denied. You can only view your own tickets.");
         }
 
@@ -104,7 +102,7 @@ public class TicketService {
 
         ticket.setAssignedStaffName(request.getAssignedStaffName());
         ticket.setStatus(TicketStatus.IN_PROGRESS);
-        return TicketResponse.fromEntity(ticketRepository.save(ticket));
+        return mapToResponse(ticketRepository.save(ticket));
     }
 
     public TicketResponse updateStatus(Long ticketId, TicketStatusRequest request) {
@@ -123,7 +121,7 @@ public class TicketService {
             }
             ticket.setRejectionReason(request.getRejectionReason());
         }
-        return TicketResponse.fromEntity(ticketRepository.save(ticket));
+        return mapToResponse(ticketRepository.save(ticket));
     }
 
     public TicketResponse updateResolution(Long ticketId, TicketResolutionRequest request) {
@@ -138,6 +136,6 @@ public class TicketService {
                 .orElseThrow(() -> new TicketNotFoundException("Ticket not found with id: " + ticketId));
 
         ticket.setResolutionNotes(request.getResolutionNotes());
-        return TicketResponse.fromEntity(ticketRepository.save(ticket));
+        return mapToResponse(ticketRepository.save(ticket));
     }
 }
