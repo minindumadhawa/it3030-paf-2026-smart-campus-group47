@@ -111,7 +111,7 @@ const MyTickets = () => {
       <main className="dashboard-content">
         <header className="dashboard-top-header">
           <div className="welcome-section">
-            <h1>👋 Welcome back, {user.fullName.split(' ')[0]}</h1>
+            <h1>👋 Welcome back, {user?.fullName?.split(' ')[0] || user?.name?.split(' ')[0] || 'User'}</h1>
             <p>Here's a snapshot of your maintenance activities and ticket requests.</p>
           </div>
           <button className="create-new-btn" onClick={() => navigate('/tickets/create')}>
