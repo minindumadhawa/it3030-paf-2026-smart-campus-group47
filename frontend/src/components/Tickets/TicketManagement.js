@@ -217,13 +217,13 @@ const TicketManagement = () => {
                 <tbody>
                   {filteredTickets.map(ticket => (
                     <tr key={ticket.id}>
-                      <td className="id-col">#{ticket.id}</td>
+                      <td className="id-col" style={{ color: '#1e293b', fontWeight: '800' }}>#{ticket.id}</td>
                       <td className="title-col">
                         <strong>{ticket.category.replace('_', ' ')}</strong>
                         <span>{ticket.description.substring(0, 30)}{ticket.description.length > 30 ? '...' : ''}</span>
                       </td>
                       <td><span className="cat-chip">{ticket.category.replace('_', ' ')}</span></td>
-                      <td><span className="loc-text">{ticket.locationOrResource || 'N/A'}</span></td>
+                      <td><span className="loc-text" style={{ color: '#1e293b', fontWeight: '600' }}>{ticket.locationOrResource || 'N/A'}</span></td>
                       <td>
                         <span className={`prio-badge ${ticket.priority.toLowerCase()}`}>
                           {ticket.priority}
@@ -234,8 +234,8 @@ const TicketManagement = () => {
                           {ticket.status.replace('_', ' ')}
                         </span>
                       </td>
-                      <td className="reporter-col">{ticket.userFullName}</td>
-                      <td className="date-col">{formatDate(ticket.createdAt)}</td>
+                      <td className="reporter-col" style={{ color: '#1e293b', fontWeight: '600' }}>{ticket.userFullName}</td>
+                      <td className="date-col" style={{ color: '#1e293b', fontWeight: '600' }}>{formatDate(ticket.createdAt)}</td>
                       <td>
                         <button className="manage-row-btn" onClick={() => navigate(`/tickets/${ticket.id}`)}>
                           Manage <ChevronRight size={16} />
