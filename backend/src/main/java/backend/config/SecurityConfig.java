@@ -1,5 +1,6 @@
 package backend.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,6 +16,10 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    // Inject custom OAuth success handler
+    @Autowired
+    private OAuthSuccessHandler oAuthSuccessHandler;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -25,16 +30,17 @@ public class SecurityConfig {
                                 "/login", "/error",
                                 "/oauth2/**",
                                 "/login/oauth2/**",
-                                "/api/auth/**"
+                                "/api/auth/**",
+                                "/api/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
-                        .defaultSuccessUrl("http://localhost:3001", true)
-                        .failureUrl("http://localhost:3001/login?error=true")
+                        .successHandler(oAuthSuccessHandler) // Use custom handler
+                        .failureUrl("http://localhost:3000/login?error=true")
                 )
                 .logout(logout -> logout
-                        .logoutSuccessUrl("http://localhost:3001")
+                        .logoutSuccessUrl("http://localhost:3000")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                 );
@@ -45,7 +51,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3001", "http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
