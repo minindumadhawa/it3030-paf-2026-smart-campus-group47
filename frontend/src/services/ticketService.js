@@ -44,12 +44,13 @@ const ticketService = {
   },
 
   // [Management] Assign a technician/staff member
-  assignStaff: async (ticketId, adminId, adminRole, staffName) => {
+  assignStaff: async (ticketId, adminId, adminRole, staffName, technicianId = null) => {
     const response = await fetch(`${API_URL}/tickets/${ticketId}/assign`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         assignedStaffName: staffName,
+        technicianId: technicianId,
         adminUserId: adminId,
         adminRole: adminRole
       }),
@@ -57,6 +58,24 @@ const ticketService = {
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.error || 'Failed to assign staff');
+    }
+    return response.json();
+  },
+
+  // Get tickets assigned to a specific technician
+  getAssignedTickets: async (technicianId) => {
+    const response = await fetch(`${API_URL}/tickets/assigned?technicianId=${technicianId}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch assigned tickets');
+    }
+    return response.json();
+  },
+
+  // Fetch technicians by specialization/category
+  getTechniciansByCategory: async (category) => {
+    const response = await fetch(`${API_URL}/technicians?specialization=${category}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch technicians');
     }
     return response.json();
   },

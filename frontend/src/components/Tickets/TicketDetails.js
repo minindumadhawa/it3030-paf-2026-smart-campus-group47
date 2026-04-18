@@ -35,6 +35,8 @@ const TicketDetails = () => {
   const [resolutionNotes, setResolutionNotes] = useState('');
   const [adminActionLoading, setAdminActionLoading] = useState(false);
   const [localStatus, setLocalStatus] = useState('');
+  const [technicians, setTechnicians] = useState([]);
+  const [selectedTechId, setSelectedTechId] = useState('');
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -54,6 +56,11 @@ const TicketDetails = () => {
       setTicket(ticketData);
       setStaffName(ticketData.assignedStaffName || '');
       setLocalStatus(ticketData.status);
+      
+      // Fetch matching technicians if admin
+      if (role === 'ADMIN') {
+        fetchMatchingTechnicians(ticketData.category);
+      }
     } catch (err) {
       setErrorMsg(err.message || 'Failed to load details.');
     } finally {
@@ -61,18 +68,26 @@ const TicketDetails = () => {
     }
   };
 
+  const fetchMatchingTechnicians = async (category) => {
+    try {
+      const techList = await ticketService.getTechniciansByCategory(category);
+      setTechnicians(techList);
+    } catch (err) {
+      console.error('Failed to fetch technicians', err);
+    }
+  };
+
   const handleAssign = async (e) => {
     e.preventDefault();
-    const trimmedStaff = staffName.trim();
-    if (!trimmedStaff) {
-      alert('Please enter a technician or department name.');
+    if (!selectedTechId) {
+      alert('Please select a technician.');
       return;
     }
 
     setAdminActionLoading(true);
     try {
-      await ticketService.assignStaff(id, user.id, user.role, trimmedStaff);
-      alert('Staff assigned successfully!');
+      await ticketService.assignStaff(id, user.id, user.role, '', selectedTechId);
+      alert('Technician assigned successfully!');
       fetchTicketData(id, user.id, user.role);
     } catch (err) {
       alert(err.message);
@@ -307,15 +322,19 @@ const TicketDetails = () => {
                   <h3><Shield size={22} className="icon-orange" /> Management</h3>
                   
                   <div className="admin-section">
-                    <label>Assign Resource</label>
+                    <label>Assign Specialized Technician</label>
                     <form onSubmit={handleAssign} className="admin-form-group">
-                      <input 
-                        type="text" 
-                        placeholder="Staff / Dept Name"
-                        value={staffName}
-                        onChange={(e) => setStaffName(e.target.value)}
-                      />
-                      <button type="submit" disabled={adminActionLoading} className="icon-btn">
+                      <select 
+                        value={selectedTechId}
+                        onChange={(e) => setSelectedTechId(e.target.value)}
+                        style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0', background: '#f8fafc' }}
+                      >
+                        <option value="">Select Technician...</option>
+                        {technicians.map(tech => (
+                          <option key={tech.id} value={tech.id}>{tech.fullName}</option>
+                        ))}
+                      </select>
+                      <button type="submit" disabled={adminActionLoading || !selectedTechId} className="icon-btn">
                         <ArrowRight size={18} />
                       </button>
                     </form>
@@ -357,6 +376,35 @@ const TicketDetails = () => {
                     <p>Reporter: <strong>{ticket.userFullName}</strong></p>
                     <p style={{marginTop: '0.25rem'}}>{ticket.userEmail}</p>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Technician Management Sidebar */}
+            {user.role === 'TECHNICIAN' && ticket.technicianId === user.id && (
+              <div className="admin-sidebar">
+                <div className="admin-card tech-card">
+                  <h3><Shield size={22} className="icon-orange" /> Technician Panel</h3>
+                  <p style={{fontSize: '0.85rem', color: '#64748b', marginBottom: '1.5rem'}}>Manage this task and update resolution.</p>
+                  
+                  {ticket.status === 'IN_PROGRESS' && (
+                    <div className="admin-section">
+                      <button 
+                        className="quick-resolve-btn"
+                        onClick={() => {
+                          setSelectedStatus('RESOLVED');
+                          setShowStatusModal(true);
+                        }}
+                        style={{ width: '100%', background: '#F37021', color: 'white', padding: '12px', border: 'none', borderRadius: '10px', fontWeight: '700', cursor: 'pointer' }}
+                      >
+                        Mark as Resolved
+                      </button>
+                    </div>
+                  )}
+
+                  {ticket.status === 'RESOLVED' && (
+                    <p style={{textAlign: 'center', color: '#166534', fontWeight: '700'}}>✅ Work Completed</p>
+                  )}
                 </div>
               </div>
             )}

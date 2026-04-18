@@ -18,4 +18,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     // Get all tickets by a specific user filtered by status
     List<Ticket> findByUserIdAndStatus(Long userId, TicketStatus status);
+
+    // Get all tickets assigned to a specific technician
+    List<Ticket> findByTechnicianId(Long technicianId);
 }

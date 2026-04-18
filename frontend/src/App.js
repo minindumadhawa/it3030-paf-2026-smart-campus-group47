@@ -14,6 +14,7 @@ import TicketManagement from "./components/Tickets/TicketManagement";
 import BookingForm from "./components/Bookings/BookingForm";
 import MyBookings from "./components/Bookings/MyBookings";
 import AdminBookingManagement from "./components/Bookings/AdminBookingManagement";
+import TechnicianDashboard from "./components/Technician/TechnicianDashboard";
 function App(){
   return (
     <div>
@@ -35,6 +36,8 @@ function App(){
           <Route path="/user/bookings" element={<MyBookings></MyBookings>}/>
           <Route path="/user/bookings/new/:resourceId" element={<BookingForm></BookingForm>}/>
           <Route path="/admin/bookings" element={<AdminBookingManagement></AdminBookingManagement>}/>
+          {/* Technician Portal */}
+          <Route path="/technician-dashboard" element={<TechnicianDashboard></TechnicianDashboard>}/>
         </Routes>
       </React.Fragment>
     </div>

@@ -27,6 +27,9 @@ public class TicketService {
     @Autowired
     private backend.repository.TicketAttachmentRepository attachmentRepository;
 
+    @Autowired
+    private backend.repository.TechnicianRepository technicianRepository;
+
     public TicketResponse createTicket(TicketRequest request) {
         if (request.getUserId() == null) throw new ValidationException("User ID is required.");
         if (request.getCategory() == null) throw new ValidationException("Category is required.");
@@ -74,7 +77,10 @@ public class TicketService {
                 .orElseThrow(() -> new TicketNotFoundException("Ticket not found with id: " + ticketId));
 
         if (!"ADMIN".equalsIgnoreCase(role) && !ticket.getUser().getId().equals(requestingUserId)) {
-            throw new UnauthorizedException("Access denied. You can only view your own tickets.");
+            // Check if the requester is the assigned technician
+            if (!"TECHNICIAN".equalsIgnoreCase(role) || ticket.getTechnician() == null || !ticket.getTechnician().getId().equals(requestingUserId)) {
+                throw new UnauthorizedException("Access denied. You can only view your own or assigned tickets.");
+            }
         }
 
         return mapToResponse(ticket);
@@ -93,26 +99,44 @@ public class TicketService {
         if (!"ADMIN".equalsIgnoreCase(request.getAdminRole())) {
             throw new UnauthorizedException("Access denied. Only Admins can assign staff.");
         }
-        if (request.getAssignedStaffName() == null || request.getAssignedStaffName().trim().isEmpty()) {
-            throw new ValidationException("Staff name is required for assignment.");
-        }
-
+        
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new TicketNotFoundException("Ticket not found with id: " + ticketId));
 
-        ticket.setAssignedStaffName(request.getAssignedStaffName());
+        if (request.getTechnicianId() != null) {
+            backend.model.Technician tech = technicianRepository.findById(request.getTechnicianId())
+                    .orElseThrow(() -> new TicketNotFoundException("Technician not found with id: " + request.getTechnicianId()));
+            ticket.setTechnician(tech);
+            ticket.setAssignedStaffName(tech.getFullName());
+        } else {
+            if (request.getAssignedStaffName() == null || request.getAssignedStaffName().trim().isEmpty()) {
+                throw new ValidationException("Staff selection is required for assignment.");
+            }
+            ticket.setAssignedStaffName(request.getAssignedStaffName());
+        }
+
         ticket.setStatus(TicketStatus.IN_PROGRESS);
         return mapToResponse(ticketRepository.save(ticket));
     }
 
-    public TicketResponse updateStatus(Long ticketId, TicketStatusRequest request) {
-        if (!"ADMIN".equalsIgnoreCase(request.getRole())) {
-            throw new UnauthorizedException("Access denied. Only Admins can update status.");
-        }
-        if (request.getStatus() == null) throw new ValidationException("Status is required.");
+    public List<TicketResponse> getTicketsForTechnician(Long technicianId) {
+        return ticketRepository.findByTechnicianId(technicianId).stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
 
+    public TicketResponse updateStatus(Long ticketId, TicketStatusRequest request) {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new TicketNotFoundException("Ticket not found with id: " + ticketId));
+
+        boolean isAdmin = "ADMIN".equalsIgnoreCase(request.getRole());
+        boolean isAssignedTech = "TECHNICIAN".equalsIgnoreCase(request.getRole()) && 
+                                 ticket.getTechnician() != null && 
+                                 ticket.getTechnician().getId().equals(request.getUserId());
+
+        if (!isAdmin && !isAssignedTech) {
+            throw new UnauthorizedException("Access denied. Only Admins or the assigned Technician can update status.");
+        }
 
         ticket.setStatus(request.getStatus());
         if (request.getStatus() == TicketStatus.REJECTED) {
@@ -125,15 +149,17 @@ public class TicketService {
     }
 
     public TicketResponse updateResolution(Long ticketId, TicketResolutionRequest request) {
-        if (!"ADMIN".equalsIgnoreCase(request.getRole())) {
-            throw new UnauthorizedException("Access denied. Only Admins can update resolution notes.");
-        }
-        if (request.getResolutionNotes() == null || request.getResolutionNotes().trim().isEmpty()) {
-            throw new ValidationException("Resolution notes are required.");
-        }
-
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new TicketNotFoundException("Ticket not found with id: " + ticketId));
+
+        boolean isAdmin = "ADMIN".equalsIgnoreCase(request.getRole());
+        boolean isAssignedTech = "TECHNICIAN".equalsIgnoreCase(request.getRole()) && 
+                                 ticket.getTechnician() != null && 
+                                 ticket.getTechnician().getId().equals(request.getUserId());
+
+        if (!isAdmin && !isAssignedTech) {
+            throw new UnauthorizedException("Access denied. Only Admins or the assigned Technician can update resolution notes.");
+        }
 
         ticket.setResolutionNotes(request.getResolutionNotes());
         return mapToResponse(ticketRepository.save(ticket));

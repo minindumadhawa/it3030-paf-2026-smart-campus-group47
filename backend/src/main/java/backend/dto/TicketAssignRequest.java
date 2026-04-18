@@ -2,13 +2,21 @@ package backend.dto;
 
 public class TicketAssignRequest {
     private String assignedStaffName;
-    private Long adminUserId;
+    private Long technicianId;
+    private Long adminId;
+    private Long adminUserId; // Legacy
     private String adminRole;
 
     public TicketAssignRequest() {}
 
     public String getAssignedStaffName() { return assignedStaffName; }
     public void setAssignedStaffName(String assignedStaffName) { this.assignedStaffName = assignedStaffName; }
+
+    public Long getTechnicianId() { return technicianId; }
+    public void setTechnicianId(Long technicianId) { this.technicianId = technicianId; }
+
+    public Long getAdminId() { return adminId; }
+    public void setAdminId(Long adminId) { this.adminId = adminId; }
 
     public Long getAdminUserId() { return adminUserId; }
     public void setAdminUserId(Long adminUserId) { this.adminUserId = adminUserId; }

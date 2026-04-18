@@ -166,7 +166,7 @@ const RegisterPage = () => {
                 <select 
                   value={specialization} 
                   onChange={(e) => setSpecialization(e.target.value)}
-                  style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #e2e8f0', background: '#f8fafc' }}
+                  style={{ width: '100%', padding: '12px 12px 12px 42px', borderRadius: '10px', border: '1px solid #e2e8f0', background: '#f8fafc' }}
                 >
                   {categories.map(cat => (
                     <option key={cat.value} value={cat.value}>{cat.label}</option>

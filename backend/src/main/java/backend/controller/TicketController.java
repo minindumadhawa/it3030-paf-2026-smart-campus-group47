@@ -43,6 +43,11 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.getMyTickets(userId));
     }
 
+    @GetMapping("/assigned")
+    public ResponseEntity<List<TicketResponse>> getAssignedTickets(@RequestParam Long technicianId) {
+        return ResponseEntity.ok(ticketService.getTicketsForTechnician(technicianId));
+    }
+
     @GetMapping
     public ResponseEntity<List<TicketResponse>> getAllTickets(@RequestParam String role) {
         return ResponseEntity.ok(ticketService.getAllTickets(role));

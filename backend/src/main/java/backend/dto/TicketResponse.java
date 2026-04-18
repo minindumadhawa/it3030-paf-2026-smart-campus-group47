@@ -21,6 +21,8 @@ public class TicketResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String assignedStaffName;
+    private Long technicianId;
+    private String technicianName;
     private java.util.List<TicketAttachmentResponse> attachments;
 
     // User info
@@ -50,6 +52,13 @@ public class TicketResponse {
             response.setUserId(ticket.getUser().getId());
             response.setUserFullName(ticket.getUser().getFullName());
             response.setUserEmail(ticket.getUser().getEmail());
+        }
+
+        if (ticket.getTechnician() != null) {
+            response.setTechnicianId(ticket.getTechnician().getId());
+            response.setTechnicianName(ticket.getTechnician().getFullName());
+            // Optionally sync assignedStaffName for backward compatibility
+            response.setAssignedStaffName(ticket.getTechnician().getFullName());
         }
 
         return response;
@@ -99,6 +108,12 @@ public class TicketResponse {
 
     public String getUserEmail() { return userEmail; }
     public void setUserEmail(String userEmail) { this.userEmail = userEmail; }
+
+    public Long getTechnicianId() { return technicianId; }
+    public void setTechnicianId(Long technicianId) { this.technicianId = technicianId; }
+
+    public String getTechnicianName() { return technicianName; }
+    public void setTechnicianName(String technicianName) { this.technicianName = technicianName; }
 
     public java.util.List<TicketAttachmentResponse> getAttachments() { return attachments; }
     public void setAttachments(java.util.List<TicketAttachmentResponse> attachments) { this.attachments = attachments; }

@@ -56,6 +56,10 @@ public class Ticket {
     @JoinColumn(name = "admin_id", nullable = true)
     private Admin admin;
 
+    @ManyToOne
+    @JoinColumn(name = "technician_id", nullable = true)
+    private Technician technician;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -112,4 +116,7 @@ public class Ticket {
 
     public Admin getAdmin() { return admin; }
     public void setAdmin(Admin admin) { this.admin = admin; }
+
+    public Technician getTechnician() { return technician; }
+    public void setTechnician(Technician technician) { this.technician = technician; }
 }
