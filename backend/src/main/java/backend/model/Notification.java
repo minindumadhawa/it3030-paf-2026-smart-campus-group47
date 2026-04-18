@@ -20,7 +20,7 @@ public class Notification {
     @Column(nullable = false)
     private String type; // BOOKING_APPROVED, BOOKING_REJECTED, TICKET_UPDATE, NEW_COMMENT
 
-    @Column(nullable = false)
+    @Column(name = "is_read", nullable = false)
     private boolean read = false;
 
     @Column(nullable = false)
