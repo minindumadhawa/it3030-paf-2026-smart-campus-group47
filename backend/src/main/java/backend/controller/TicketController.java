@@ -69,7 +69,7 @@ public class TicketController {
     @PutMapping("/{id}/status")
     public ResponseEntity<TicketResponse> updateStatus(@PathVariable Long id, @RequestBody TicketStatusRequest request) {
         TicketResponse response = ticketService.updateStatus(id, request);
-        // ✅ ADDED - Ticket status change වෙලාවට notification
+        // ADDED - Generate and send a notification to the user when the ticket status is updated
         notificationService.createNotification(
                 response.getUserId(),
                 "Your ticket for '" + response.getLocationOrResource() + "' status changed to " + response.getStatus(),
