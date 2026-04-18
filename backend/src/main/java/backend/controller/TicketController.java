@@ -20,7 +20,7 @@ public class TicketController {
     @Autowired
     private backend.service.AttachmentService attachmentService;
 
-    // ✅ ADDED - NotificationService inject කරනවා
+    // ADDED - NotificationService inject
     @Autowired
     private NotificationService notificationService;
 

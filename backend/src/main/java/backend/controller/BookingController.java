@@ -20,7 +20,7 @@ public class BookingController {
     @Autowired
     private BookingService bookingService;
 
-    // ✅ ADDED - NotificationService inject කරනවා
+    // ADDED - NotificationService inject
     @Autowired
     private NotificationService notificationService;
 
@@ -54,7 +54,7 @@ public class BookingController {
             BookingStatus newStatus = BookingStatus.valueOf(statusStr);
             BookingResponse response = bookingService.updateBookingStatus(id, newStatus, reason);
 
-            // ✅ ADDED - Booking approve/reject වෙලාවට notification
+            // ADDED - Booking approve/reject notification
             if (newStatus == BookingStatus.APPROVED) {
                 notificationService.createNotification(
                         response.getUserId(),

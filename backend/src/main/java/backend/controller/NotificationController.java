@@ -16,35 +16,35 @@ public class NotificationController {
     @Autowired
     private NotificationService notificationService;
 
-    // GET - User ගේ සියලු notifications ගන්නවා
+    // GET - Retrieve all notifications for the user
     @GetMapping("/{userId}")
     public ResponseEntity<List<Notification>> getNotifications(@PathVariable Long userId) {
         List<Notification> notifications = notificationService.getNotificationsByUser(userId);
         return ResponseEntity.ok(notifications);
     }
 
-    // GET - Unread notification count ගන්නවා
+    // GET - Retrieve unread notification count
     @GetMapping("/unread-count/{userId}")
     public ResponseEntity<Long> getUnreadCount(@PathVariable Long userId) {
         long count = notificationService.getUnreadCount(userId);
         return ResponseEntity.ok(count);
     }
 
-    // PUT - Notification එකක් read කරන්න
+    // PUT - Mark a notification as read
     @PutMapping("/{id}")
     public ResponseEntity<Notification> markAsRead(@PathVariable Long id) {
         Notification updated = notificationService.markAsRead(id);
         return ResponseEntity.ok(updated);
     }
 
-    // PUT - සියලු notifications read කරන්න
+    // PUT - Mark all notifications as read
     @PutMapping("/mark-all-read/{userId}")
     public ResponseEntity<Void> markAllAsRead(@PathVariable Long userId) {
         notificationService.markAllAsRead(userId);
         return ResponseEntity.ok().build();
     }
 
-    // ✅ ADDED - Notification එකක් delete කරන්න
+    // ADDED - Delete a notification
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNotification(@PathVariable Long id) {
         notificationService.deleteNotification(id);

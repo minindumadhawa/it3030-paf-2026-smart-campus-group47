@@ -32,7 +32,7 @@ public class CommentController {
             @RequestBody CommentRequest request) {
         CommentResponse response = commentService.addComment(ticketId, request);
 
-        // ✅ ADDED - Comment add වෙලාවට ticket owner ට notification
+        // ADDED - Send a notification to the ticket owner when a comment is added.
         try {
             backend.dto.TicketResponse ticket = ticketService.getTicketById(ticketId, request.getUserId(), "USER");
             if (!ticket.getUserId().equals(request.getUserId())) {
