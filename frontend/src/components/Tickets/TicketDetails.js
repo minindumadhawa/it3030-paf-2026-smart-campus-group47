@@ -242,6 +242,51 @@ const TicketDetails = () => {
         ) : (
           <div className="detail-layout">
             <div className="detail-left-col">
+              {/* Ticket Lifecycle Stepper */}
+              <div className="ticket-stepper-container">
+                <div className="ticket-stepper">
+                  {(() => {
+                    const getStepIndex = (status, assignedStaff) => {
+                      if (status === 'CLOSED') return 4;
+                      if (status === 'RESOLVED') return 3;
+                      if (status === 'IN_PROGRESS') return 2;
+                      if (assignedStaff) return 1;
+                      return 0;
+                    };
+                    const currentIndex = getStepIndex(ticket.status, ticket.assignedStaffName);
+                    const progressWidth = (currentIndex / 4) * 80; // 80% is the distance between first and last circle centers
+
+                    return (
+                      <>
+                        <div className="step-line-progress" style={{ width: `${progressWidth}%` }}></div>
+                        
+                        {[
+                          { label: 'Open', icon: <Clock size={16} /> },
+                          { label: 'Assigned', icon: <Shield size={16} /> },
+                          { label: 'In Progress', icon: <Info size={16} /> },
+                          { label: 'Resolved', icon: <CheckCircle size={16} /> },
+                          { label: 'Closed', icon: <CheckCircle size={16} /> },
+                        ].map((step, index) => {
+                          const isCompleted = index < currentIndex || ticket.status === 'CLOSED' || (ticket.status === 'RESOLVED' && index <= 3);
+                          const isActive = index === currentIndex && ticket.status !== 'CLOSED' && (ticket.status !== 'RESOLVED' || index !== 3);
+                          // Special handling for terminal states
+                          const finalCompleted = ticket.status === 'CLOSED' || (ticket.status === 'RESOLVED' && index <= 3);
+
+                          return (
+                            <div key={index} className={`step-item ${finalCompleted && index <= currentIndex ? 'completed' : ''} ${isActive ? 'active' : ''}`}>
+                              <div className="step-icon-wrapper">
+                                {(finalCompleted && index <= currentIndex) || (index < currentIndex) ? <CheckCircle size={20} /> : step.icon}
+                              </div>
+                              <div className="step-label">{step.label}</div>
+                            </div>
+                          );
+                        })}
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+
               {/* Ticket Hero Section */}
               <div className="details-card">
                 <div className="details-header">
@@ -287,7 +332,7 @@ const TicketDetails = () => {
                     <div className="info-sections-grid">
                       <div className="detail-item">
                         <span className="detail-item-label">Priority Level</span>
-                        <div className={`detail-item-value priority-${ticket.priority.toLowerCase()}`}>
+                        <div className={`priority-badge priority-${ticket.priority.toLowerCase()}`}>
                           <AlertCircle size={18} /> {ticket.priority}
                         </div>
                       </div>

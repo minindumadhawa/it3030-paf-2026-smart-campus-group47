@@ -8,6 +8,21 @@ import {
 import ticketService from '../../services/ticketService';
 import './MyTickets.css';
 
+const statusDisplay = {
+  OPEN: { label: 'Open', icon: <Clock size={14} />, class: 'status-open' },
+  IN_PROGRESS: { label: 'In Progress', icon: <Info size={14} />, class: 'status-in-progress' },
+  RESOLVED: { label: 'Resolved', icon: <CheckCircle size={14} />, class: 'status-resolved' },
+  REJECTED: { label: 'Rejected', icon: <XCircle size={14} />, class: 'status-rejected' },
+  CLOSED: { label: 'Closed', icon: <CheckCircle size={14} />, class: 'status-resolved' },
+};
+
+const priorityDisplay = {
+  URGENT: { icon: <AlertCircle size={14} />, class: 'urgent' },
+  HIGH: { icon: <Info size={14} />, class: 'high' },
+  MEDIUM: { icon: <Info size={14} />, class: 'medium' },
+  LOW: { icon: <Info size={14} />, class: 'low' },
+};
+
 const MyTickets = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -242,13 +257,13 @@ const MyTickets = () => {
                       <td className="desc-cell">{ticket.description.substring(0, 40)}{ticket.description.length > 40 ? '...' : ''}</td>
                       <td><span className="cat-text">{ticket.category.replace('_', ' ')}</span></td>
                       <td>
-                        <span className={`prio-tag ${ticket.priority.toLowerCase()}`}>
-                          {ticket.priority}
+                        <span className={`prio-tag ${priorityDisplay[ticket.priority]?.class}`}>
+                          {priorityDisplay[ticket.priority]?.icon} {ticket.priority}
                         </span>
                       </td>
                       <td>
-                        <span className={`status-pill status-${ticket.status.toLowerCase().replace('_', '-')}`}>
-                          {ticket.status.replace('_', ' ')}
+                        <span className={`status-pill ${statusDisplay[ticket.status]?.class}`}>
+                          {statusDisplay[ticket.status]?.icon} {statusDisplay[ticket.status]?.label}
                         </span>
                       </td>
                       <td className="date-cell">{formatDate(ticket.createdAt)}</td>

@@ -65,16 +65,23 @@
   }
   
   .status-badge-large {
-    padding: 0.6rem 1.25rem;
+    padding: 0.75rem 1.5rem;
     border-radius: 12px;
-    font-weight: 700;
+    font-weight: 800;
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    font-size: 1rem;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    gap: 0.75rem;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .status-badge-large svg {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
   }
   
   .details-body {
@@ -220,10 +227,21 @@
   .admin-status-select.status-rejected { background-color: #fef2f2; border-color: #fecaca; color: #991b1b; }
   .admin-status-select.status-closed { background-color: #f1f5f9; border-color: #cbd5e1; color: #1e293b; }
   
-  /* Priority Color Modifiers */
-  .priority-high { color: #ef4444; }
-  .priority-medium { color: #f97316; }
-  .priority-low { color: #22c55e; }
+  /* Priority Color Modifiers & Badges */
+  .priority-badge {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .priority-urgent { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+  .priority-high { background: #ffedd5; color: #9a3412; border: 1px solid #fed7aa; }
+  .priority-medium { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+  .priority-low { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
   
   .icon-orange { color: #F37021; }
   
@@ -352,4 +370,99 @@
   @keyframes slideUp {
     from { transform: translateY(20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
+  }
+
+  /* --- Lifecycle Stepper Styles --- */
+  .ticket-stepper-container {
+    background: white;
+    padding: 2.5rem 1.5rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  }
+
+  .ticket-stepper {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* Background Line */
+  .ticket-stepper::before {
+    content: '';
+    position: absolute;
+    top: 24px;
+    left: 10%;
+    right: 10%;
+    height: 3px;
+    background: #e2e8f0;
+    z-index: 1;
+  }
+
+  .step-item {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+  }
+
+  .step-icon-wrapper {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    transition: all 0.3s ease;
+    margin-bottom: 12px;
+  }
+
+  .step-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    text-align: center;
+  }
+
+  /* Active/Completed States */
+  .step-item.active .step-icon-wrapper {
+    border-color: #F37021;
+    color: #F37021;
+    box-shadow: 0 0 15px rgba(243, 112, 33, 0.3);
+    transform: scale(1.1);
+  }
+
+  .step-item.active .step-label {
+    color: #0b2239;
+  }
+
+  .step-item.completed .step-icon-wrapper {
+    background: #10b981;
+    border-color: #10b981;
+    color: white;
+  }
+
+  .step-item.completed .step-label {
+    color: #059669;
+  }
+
+  /* Connection Line progress */
+  .step-line-progress {
+    position: absolute;
+    top: 24px;
+    left: 10%;
+    height: 3px;
+    background: #10b981;
+    z-index: 1;
+    transition: width 0.5s ease;
   }
