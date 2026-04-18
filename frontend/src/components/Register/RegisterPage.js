@@ -11,7 +11,20 @@ const RegisterPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [selectedRole, setSelectedRole] = useState('USER');
+  const [specialization, setSpecialization] = useState('IT_SUPPORT');
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isTechnician, setIsTechnician] = useState(false);
+
+  const categories = [
+    { value: 'IT_SUPPORT', label: 'IT Support' },
+    { value: 'MAINTENANCE', label: 'General Maintenance' },
+    { value: 'ELECTRICAL', label: 'Electrical' },
+    { value: 'PLUMBING', label: 'Plumbing' },
+    { value: 'CLEANING', label: 'Cleaning' },
+    { value: 'FACILITY', label: 'Facility Management' },
+    { value: 'FURNITURE', label: 'Furniture' }
+  ];
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -24,13 +37,22 @@ const RegisterPage = () => {
     }
 
     try {
-      const registerUrl = isAdmin ? 'http://localhost:8080/api/admins/register' : 'http://localhost:8080/api/users/register';
+      let registerUrl = 'http://localhost:8080/api/users/register';
+      let payload = { fullName, email, password };
+
+      if (isAdmin) {
+        registerUrl = 'http://localhost:8080/api/admins/register';
+      } else if (isTechnician) {
+        registerUrl = 'http://localhost:8080/api/technicians/register';
+        payload.specialization = specialization;
+      }
+
       const response = await fetch(registerUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ fullName, email, password }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -108,16 +130,50 @@ const RegisterPage = () => {
               />
             </div>
 
-            <div className="checkbox-group" style={{ marginBottom: '15px', display: 'flex', alignItems: 'center' }}>
-              <input 
-                type="checkbox" 
-                id="isAdminCheckbox" 
-                checked={isAdmin} 
-                onChange={(e) => setIsAdmin(e.target.checked)} 
-                style={{ marginRight: '8px' }}
-              />
-              <label htmlFor="isAdminCheckbox" style={{ fontSize: '14px', color: '#475569', cursor: 'pointer' }}>Register as Administrator</label>
+            <div className="checkbox-group" style={{ marginBottom: '15px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                <input 
+                  type="checkbox" 
+                  id="isAdminCheckbox" 
+                  checked={isAdmin} 
+                  onChange={(e) => {
+                    setIsAdmin(e.target.checked);
+                    if (e.target.checked) setIsTechnician(false);
+                  }} 
+                  style={{ marginRight: '8px' }}
+                />
+                <label htmlFor="isAdminCheckbox" style={{ fontSize: '14px', color: '#475569', cursor: 'pointer' }}>Register as Administrator</label>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                <input 
+                  type="checkbox" 
+                  id="isTechCheckbox" 
+                  checked={isTechnician} 
+                  onChange={(e) => {
+                    setIsTechnician(e.target.checked);
+                    if (e.target.checked) setIsAdmin(false);
+                  }} 
+                  style={{ marginRight: '8px' }}
+                />
+                <label htmlFor="isTechCheckbox" style={{ fontSize: '14px', color: '#475569', cursor: 'pointer' }}>Register as Technician</label>
+              </div>
             </div>
+
+            {isTechnician && (
+              <div className="input-group" style={{ marginBottom: '20px' }}>
+                <div className="input-icon">🛠️</div>
+                <select 
+                  value={specialization} 
+                  onChange={(e) => setSpecialization(e.target.value)}
+                  style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #e2e8f0', background: '#f8fafc' }}
+                >
+                  {categories.map(cat => (
+                    <option key={cat.value} value={cat.value}>{cat.label}</option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <button type="submit" className="primary-register-btn">
               <span>Register</span>
