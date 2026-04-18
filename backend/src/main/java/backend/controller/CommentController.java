@@ -34,8 +34,8 @@ public class CommentController {
 
         // ADDED - Send a notification to the ticket owner when a comment is added.
         try {
-            backend.dto.TicketResponse ticket = ticketService.getTicketById(ticketId, request.getUserId(), "USER");
-            if (!ticket.getUserId().equals(request.getUserId())) {
+            String role = request.getRole() != null ? request.getRole() : "USER";
+            backend.dto.TicketResponse ticket = ticketService.getTicketById(ticketId, request.getUserId(), role);            if (!ticket.getUserId().equals(request.getUserId())) {
                 notificationService.createNotification(
                         ticket.getUserId(),
                         "New comment added on your ticket for '" + ticket.getLocationOrResource() + "'",
@@ -43,7 +43,7 @@ public class CommentController {
                 );
             }
         } catch (Exception ignored) {}
-        return new ResponseEntity<>(commentService.addComment(ticketId, request), HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping("/tickets/{ticketId}/comments")
