@@ -13,6 +13,8 @@ const UserDashboard = () => {
       const parsedUser = JSON.parse(storedUser);
       if (parsedUser.role === 'ADMIN') {
         navigate('/admin-dashboard');
+      } else if (parsedUser.role === 'TECHNICIAN') {
+        navigate('/technician-dashboard');
       } else {
         setUser(parsedUser);
       }

@@ -25,7 +25,6 @@ public class Comment {
     @JoinColumn(name = "ticket_id", nullable = false)
     private Ticket ticket;
 
-    // A comment belongs to one user
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = true)
     private User user;
@@ -33,6 +32,10 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "admin_id", nullable = true)
     private Admin admin;
+
+    @ManyToOne
+    @JoinColumn(name = "technician_id", nullable = true)
+    private Technician technician;
 
     @PrePersist
     protected void onCreate() {
@@ -68,4 +71,7 @@ public class Comment {
 
     public Admin getAdmin() { return admin; }
     public void setAdmin(Admin admin) { this.admin = admin; }
+
+    public Technician getTechnician() { return technician; }
+    public void setTechnician(Technician technician) { this.technician = technician; }
 }

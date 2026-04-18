@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './RegisterPage.css';
 import logo from '../../images/SLIIT.png';
+import { useNotification } from '../../context/NotificationContext';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -9,8 +10,7 @@ const RegisterPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
+  const { showNotification } = useNotification();
   const [selectedRole, setSelectedRole] = useState('USER');
   const [specialization, setSpecialization] = useState('IT_SUPPORT');
   const [isAdmin, setIsAdmin] = useState(false);
@@ -28,11 +28,9 @@ const RegisterPage = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setErrorMsg('');
-    setSuccessMsg('');
 
     if (password !== confirmPassword) {
-      setErrorMsg("Passwords don't match!");
+      showNotification("Passwords don't match!", 'error');
       return;
     }
 
@@ -57,15 +55,15 @@ const RegisterPage = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        setErrorMsg(errorData.error || 'Registration failed');
+        showNotification(errorData.error || 'Registration failed', 'error');
       } else {
-        setSuccessMsg('Registration successful! Redirecting to login...');
+        showNotification('Registration successful! Redirecting to login...', 'success');
         setTimeout(() => {
           navigate('/login');
         }, 2000);
       }
     } catch (error) {
-      setErrorMsg('Network error. Please try again later.');
+      showNotification('Network error. Please try again later.', 'error');
     }
   };
 
@@ -83,8 +81,6 @@ const RegisterPage = () => {
         </div>
         
         <div className="register-body">
-          {errorMsg && <div className="error-message">{errorMsg}</div>}
-          {successMsg && <div className="success-message">{successMsg}</div>}
           <form className="register-form" onSubmit={handleRegister}>
             <div className="input-group">
               <div className="input-icon">👤</div>

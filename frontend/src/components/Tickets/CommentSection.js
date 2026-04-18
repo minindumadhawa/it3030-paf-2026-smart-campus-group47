@@ -164,7 +164,7 @@ const CommentSection = ({ ticketId }) => {
                             ) : (
                                 <>
                                     <p className="comment-text">{comment.content}</p>
-                                    {(user && (user.id === comment.userId || user.role === 'ADMIN')) && (
+                                    {(user && (String(user.id) === String(comment.userId) && user.role === comment.authorRole)) && (
                                         <div className="comment-actions">
                                             <button className="action-btn edit-btn" onClick={() => startEditing(comment)}>
                                                 <Edit2 size={14} /> Edit

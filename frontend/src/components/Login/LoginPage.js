@@ -3,16 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import './LoginPage.css';
 import logo from '../../images/SLIIT.png';
 import { Mail, Lock, LogIn } from 'lucide-react';
+import { useNotification } from '../../context/NotificationContext';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
+  const { showNotification } = useNotification();
 
   const handleEmailLogin = async (e) => {
     e.preventDefault();
-    setErrorMsg('');
     try {
       const response = await fetch('http://localhost:8080/api/users/login', {
         method: 'POST',
@@ -22,6 +22,7 @@ const LoginPage = () => {
       if (response.ok) {
         const userData = await response.json();
         localStorage.setItem('user', JSON.stringify(userData));
+        showNotification('Login successful! Welcome back.', 'success');
         if (userData.role === 'ADMIN') {
           navigate('/admin-dashboard');
         } else if (userData.role === 'TECHNICIAN') {
@@ -31,10 +32,10 @@ const LoginPage = () => {
         }
       } else {
         const data = await response.json();
-        setErrorMsg(data.error || 'Login failed');
+        showNotification(data.error || 'Login failed. Please check your credentials.', 'error');
       }
     } catch(err) {
-      setErrorMsg('Network error. Please try again.');
+      showNotification('Network error. Please try again later.', 'error');
     }
   };
 
@@ -54,7 +55,6 @@ const LoginPage = () => {
         </div>
 
         <div className="login-body">
-          {errorMsg && <div className="error-message" style={{ backgroundColor: '#fef2f2', color: '#dc2626', padding: '10px', borderRadius: '6px', fontSize: '14px', marginBottom: '15px', textAlign: 'center' }}>{errorMsg}</div>}
           <form className="login-form" onSubmit={handleEmailLogin}>
             <div className="input-group">
               <div className="input-icon">

@@ -1,6 +1,9 @@
 package backend.dto;
 
 import backend.model.Comment;
+import backend.model.Technician;
+import backend.model.Admin;
+import backend.model.User;
 import java.time.LocalDateTime;
 
 public class CommentResponse {
@@ -8,6 +11,7 @@ public class CommentResponse {
     private String content;
     private Long userId;
     private String userFullName;
+    private String authorRole; // NEW: To distinguish between ADMIN, TECHNICIAN, STUDENT
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -23,9 +27,15 @@ public class CommentResponse {
         if (comment.getAdmin() != null) {
             response.setUserId(comment.getAdmin().getId());
             response.setUserFullName(comment.getAdmin().getFullName() + " (System Admin)");
+            response.setAuthorRole("ADMIN");
+        } else if (comment.getTechnician() != null) {
+            response.setUserId(comment.getTechnician().getId());
+            response.setUserFullName(comment.getTechnician().getFullName() + " (Technician)");
+            response.setAuthorRole("TECHNICIAN");
         } else if (comment.getUser() != null) {
             response.setUserId(comment.getUser().getId());
             response.setUserFullName(comment.getUser().getFullName());
+            response.setAuthorRole("USER");
         }
         
         return response;
@@ -42,6 +52,9 @@ public class CommentResponse {
 
     public String getUserFullName() { return userFullName; }
     public void setUserFullName(String userFullName) { this.userFullName = userFullName; }
+
+    public String getAuthorRole() { return authorRole; }
+    public void setAuthorRole(String authorRole) { this.authorRole = authorRole; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

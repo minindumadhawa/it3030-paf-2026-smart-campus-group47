@@ -1,31 +1,29 @@
 import React, { useState } from 'react';
 import { Image, X, Upload, CheckCircle, AlertCircle } from 'lucide-react';
 import ticketService from '../../services/ticketService';
+import { useNotification } from '../../context/NotificationContext';
 import './UploadAttachment.css';
 
 const UploadAttachment = ({ ticketId, onUploadSuccess, currentAttachmentCount }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [uploading, setUploading] = useState(false);
-  const [message, setMessage] = useState({ type: '', text: '' });
+  const { showNotification } = useNotification();
 
   const maxAllowed = 3 - currentAttachmentCount;
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     
-    // Clear previous messages
-    setMessage({ type: '', text: '' });
-
     // Filter only images
     const imageFiles = files.filter(file => file.type.startsWith('image/'));
     if (imageFiles.length !== files.length) {
-      setMessage({ type: 'error', text: 'Only image files are allowed.' });
+      showNotification('Only image files are allowed.', 'error');
       return;
     }
 
     if (selectedFiles.length + imageFiles.length > maxAllowed) {
-      setMessage({ type: 'error', text: `You can only add ${maxAllowed} more image(s) overall.` });
+      showNotification(`You can only add ${maxAllowed} more image(s) overall.`, 'warning');
       return;
     }
 
@@ -44,16 +42,15 @@ const UploadAttachment = ({ ticketId, onUploadSuccess, currentAttachmentCount })
     if (selectedFiles.length === 0) return;
     
     setUploading(true);
-    setMessage({ type: '', text: '' });
 
     try {
       await ticketService.uploadAttachments(ticketId, selectedFiles);
-      setMessage({ type: 'success', text: 'Images uploaded successfully!' });
+      showNotification('Images uploaded successfully!', 'success');
       setSelectedFiles([]);
       setPreviews([]);
       if (onUploadSuccess) onUploadSuccess();
     } catch (err) {
-      setMessage({ type: 'error', text: err.message || 'Upload failed.' });
+      showNotification(err.message || 'Upload failed.', 'error');
     } finally {
       setUploading(false);
     }
@@ -119,13 +116,6 @@ const UploadAttachment = ({ ticketId, onUploadSuccess, currentAttachmentCount })
           >
             {uploading ? 'Uploading...' : `Upload ${selectedFiles.length} File(s)`}
           </button>
-        )}
-
-        {message.text && (
-          <div className={`upload-message ${message.type}`}>
-            {message.type === 'success' ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
-            {message.text}
-          </div>
         )}
       </div>
     </div>

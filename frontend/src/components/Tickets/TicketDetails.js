@@ -189,10 +189,16 @@ const TicketDetails = () => {
       <nav className="ticket-nav">
         <div className="nav-logo">SLIIT Smart Campus</div>
         <div className="nav-links">
-          <button className="nav-link-btn" onClick={() => navigate(user.role === 'ADMIN' ? '/admin-dashboard' : '/dashboard')}>Dashboard</button>
-          <button className="nav-link-btn" onClick={() => navigate(user.role === 'ADMIN' ? '/admin/tickets' : '/tickets/my')}>
-            {user.role === 'ADMIN' ? 'All Tickets' : 'My Tickets'}
-          </button>
+          {user.role === 'TECHNICIAN' ? (
+            <button className="nav-link-btn" onClick={() => navigate('/technician-dashboard')}>Technician Portal</button>
+          ) : (
+            <>
+              <button className="nav-link-btn" onClick={() => navigate(user.role === 'ADMIN' ? '/admin-dashboard' : '/dashboard')}>Dashboard</button>
+              <button className="nav-link-btn" onClick={() => navigate(user.role === 'ADMIN' ? '/admin/tickets' : '/tickets/my')}>
+                {user.role === 'ADMIN' ? 'All Tickets' : 'My Tickets'}
+              </button>
+            </>
+          )}
           <button className="logout-btn" onClick={() => { localStorage.removeItem('user'); navigate('/login'); }}>
             <LogOut size={16} style={{marginRight: '5px'}}/> Logout
           </button>
@@ -200,8 +206,11 @@ const TicketDetails = () => {
       </nav>
 
       <main className="details-main">
-        <Link to={user.role === 'ADMIN' ? '/admin/tickets' : '/tickets/my'} className="back-link">
-          <ChevronLeft size={20} /> Back to {user.role === 'ADMIN' ? 'Tickets Portal' : 'My Tickets'}
+        <Link 
+          to={user.role === 'ADMIN' ? '/admin/tickets' : user.role === 'TECHNICIAN' ? '/technician-dashboard' : '/tickets/my'} 
+          className="back-link"
+        >
+          <ChevronLeft size={20} /> Back to {user.role === 'ADMIN' ? 'Tickets Portal' : user.role === 'TECHNICIAN' ? 'My Assignments' : 'My Tickets'}
         </Link>
 
         {loading ? (
@@ -309,7 +318,7 @@ const TicketDetails = () => {
                   )}
                 </div>
 
-                {user.role === 'STUDENT' && ticket.status === 'OPEN' && (
+                {user.role === 'USER' && ticket.status === 'OPEN' && (
                   <UploadAttachment 
                     ticketId={id} 
                     currentAttachmentCount={ticket.attachments?.length || 0}
