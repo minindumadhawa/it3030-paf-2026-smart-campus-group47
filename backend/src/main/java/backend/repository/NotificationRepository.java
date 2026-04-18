@@ -9,12 +9,12 @@ import java.util.List;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-    // User එකෙන් notifications ලබාගන්නවා (අලුත්ම ඒවා පළමුව)
+    // GET - Retrieve user notifications (newest first)
     List<Notification> findByUserIdOrderByCreatedAtDesc(Long userId);
 
-    // Unread count ගන්නවා
+    // GET - Count unread notifications for user
     long countByUserIdAndReadFalse(Long userId);
 
-    // User ගේ unread notifications
+    // GET - Retrieve unread notifications for user
     List<Notification> findByUserIdAndReadFalse(Long userId);
 }
