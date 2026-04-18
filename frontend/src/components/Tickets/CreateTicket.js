@@ -128,7 +128,7 @@ const CreateTicket = () => {
       // 1. Create the Ticket
       const newTicket = await ticketService.createTicket({
         userId: user.id,
-        role: user.role,
+        role: user.role || 'USER',
         category: formData.category,
         description: trimmedDesc,
         priority: formData.priority,

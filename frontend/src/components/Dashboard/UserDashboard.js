@@ -2,12 +2,32 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LayoutDashboard, PlusCircle, ArrowRight } from 'lucide-react';
 import './UserDashboard.css';
+import NotificationBell from '../Notification/NotificationBell';
 
 const UserDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
+    // Check URL params from Google OAuth redirect
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlUserId = urlParams.get('userId');
+    const urlName = urlParams.get('name');
+    const urlEmail = urlParams.get('email');
+
+    if (urlUserId) {
+      const oauthUser = {
+        id: parseInt(urlUserId),
+        fullName: urlName,
+        email: urlEmail,
+        role: 'USER'
+      };
+      localStorage.setItem('user', JSON.stringify(oauthUser));
+      setUser(oauthUser);
+      window.history.replaceState({}, '', '/dashboard');
+      return;
+    }
+
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
@@ -30,9 +50,12 @@ const UserDashboard = () => {
 
   return (
     <div className="dashboard-container">
-      <nav className="dashboard-nav">
+       <nav className="dashboard-nav">
         <div className="nav-logo">Smart Campus Hub</div>
-        <button className="logout-btn" onClick={handleLogout}>Logout</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <NotificationBell userId={user?.id} />
+          <button className="logout-btn" onClick={handleLogout}>Logout</button>
+        </div>
       </nav>
 
       <main className="dashboard-main">
@@ -87,13 +110,22 @@ const UserDashboard = () => {
             </div>
           </div>
 
+          {/* ✅ UPDATED - Notifications card */}
           <div className="widget-card premium-glass">
             <h3>System Notifications</h3>
-            <p className="empty-state">Inbox is empty. Stay tuned!</p>
+            <p className="empty-state">
+              <span
+                style={{ color: '#f97316', cursor: 'pointer', fontWeight: '600' }}
+                onClick={() => navigate('/alerts')}
+              >
+                View all notifications →
+              </span>
+            </p>
           </div>
         </section>
       </main>
     </div>
+    
   );
 };
 
