@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { 
+  ArrowLeft, Calendar, User, Box, 
+  Clock, CheckCircle, XCircle, Briefcase, 
+  ArrowRight, Info, Shield, LogOut, Check
+} from 'lucide-react';
 import { useNotification } from '../../context/NotificationContext';
 import './Bookings.css';
 
@@ -83,90 +88,124 @@ const AdminBookingManagement = () => {
 
   const filteredBookings = bookings.filter(b => filter === 'ALL' ? true : b.status === filter);
 
-  if (loading) return <div className="admin-loading">Loading bookings...</div>;
+  if (loading) return <div className="admin-loading">Loading Booking Records</div>;
 
   return (
     <div className="admin-dashboard-container">
       <nav className="admin-dashboard-nav">
         <div className="nav-logo" onClick={() => navigate('/admin-dashboard')} style={{cursor: 'pointer'}}>
-          Smart Campus <span>| Admin Portal</span>
+          SLIIT Smart Campus <span>| Admin Portal</span>
         </div>
-        <button className="logout-btn" onClick={() => navigate('/admin-dashboard')}>Back to Dashboard</button>
+        <button className="back-btn" onClick={() => navigate('/admin-dashboard')}>
+          <ArrowLeft size={16} /> Back to Dashboard
+        </button>
       </nav>
 
-      <main className="admin-dashboard-main bookings-admin-main">
+      <main className="admin-dashboard-main">
         <header className="admin-dashboard-header">
-          <h2>Manage Booking Requests</h2>
-          <div className="filter-controls">
-            <span className="filter-label">Filter Status:</span>
-            <select value={filter} onChange={(e) => setFilter(e.target.value)} className="filter-select">
-              <option value="ALL">All Statuses</option>
-              <option value="PENDING">Pending</option>
-              <option value="APPROVED">Approved</option>
-              <option value="REJECTED">Rejected</option>
-              <option value="CANCELLED">Cancelled</option>
-            </select>
+          <h1>
+            <Briefcase className="icon-orange" size={32} style={{marginRight: '12px', verticalAlign: 'middle'}}/>
+            Manage Booking Requests
+          </h1>
+          <p>Review and process facility booking requests from students and staff.</p>
+          
+          <div className="filter-controls" style={{marginTop: '20px'}}>
+             <span style={{fontSize: '14px', fontWeight: '700', color: '#64748b', marginRight: '10px'}}>FILTER STATUS:</span>
+             <select value={filter} onChange={(e) => setFilter(e.target.value)} className="filter-select">
+               <option value="ALL">All Statuses</option>
+               <option value="PENDING">Pending</option>
+               <option value="APPROVED">Approved</option>
+               <option value="REJECTED">Rejected</option>
+               <option value="CANCELLED">Cancelled</option>
+             </select>
           </div>
         </header>
 
-        <section className="bookings-table-container premium-glass-admin">
+        <section className="admin-premium-card" style={{padding: '0', overflow: 'hidden'}}>
           {filteredBookings.length === 0 ? (
-            <p className="empty-state">No bookings found for the selected filter.</p>
+            <div style={{padding: '50px', textAlign: 'center'}}>
+               <p className="empty-state">No bookings found for the selected criteria.</p>
+            </div>
           ) : (
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>User</th>
-                  <th>Resource</th>
-                  <th>Date & Time</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredBookings.map(b => (
-                  <tr key={b.id}>
-                    <td>#{b.id}</td>
-                    <td>{b.userName}</td>
-                    <td>{b.resourceName} ({b.resourceType})</td>
-                    <td>{b.bookingDate} | {b.startTime} - {b.endTime}</td>
-                    <td>
-                      <span className={`status-badge admin-badge-${b.status.toLowerCase()}`}>
-                        {b.status}
-                      </span>
-                    </td>
-                    <td>
-                      {b.status === 'PENDING' && (
-                        <div className="action-buttons">
-                          <button className="approve-s-btn" onClick={() => openActionModal(b, 'APPROVED')}>Approve</button>
-                          <button className="reject-s-btn" onClick={() => openActionModal(b, 'REJECTED')}>Reject</button>
-                        </div>
-                      )}
-                      {b.status !== 'PENDING' && (
-                          <span className="action-completed-text">No actions</span>
-                      )}
-                    </td>
+            <div className="table-responsive">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Ref ID</th>
+                    <th>Requester</th>
+                    <th>Resource</th>
+                    <th>Date & Time</th>
+                    <th>Status</th>
+                    <th style={{textAlign: 'right'}}>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {filteredBookings.map(b => (
+                    <tr key={b.id}>
+                      <td style={{fontWeight: '700', color: '#F37021'}}>#{b.id}</td>
+                      <td>
+                        <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                           <User size={14} color="#64748b" /> {b.userName}
+                        </div>
+                      </td>
+                      <td>
+                        <strong>{b.resourceName}</strong> 
+                        <span style={{fontSize: '11px', color: '#94a3b8', display: 'block'}}>{b.resourceType.replace('_', ' ')}</span>
+                      </td>
+                      <td>
+                        <div style={{fontSize: '13px'}}>
+                           <Calendar size={13} style={{marginRight: '5px'}} color="#64748b"/> {b.bookingDate}
+                        </div>
+                        <div style={{fontSize: '12px', color: '#64748b', marginTop: '3px'}}>
+                           <Clock size={12} style={{marginRight: '5px'}}/> {b.startTime} - {b.endTime}
+                        </div>
+                      </td>
+                      <td>
+                        <span className={`status-badge admin-badge-${b.status.toLowerCase()}`}>
+                          {b.status}
+                        </span>
+                      </td>
+                      <td style={{textAlign: 'right'}}>
+                        {b.status === 'PENDING' && (
+                          <div className="action-buttons" style={{justifyContent: 'flex-end'}}>
+                            <button className="approve-s-btn" onClick={() => openActionModal(b, 'APPROVED')} title="Approve Request">
+                               <Check size={14} style={{marginRight: '5px'}}/> Approve
+                            </button>
+                            <button className="reject-s-btn" onClick={() => openActionModal(b, 'REJECTED')} title="Reject Request">
+                               <XCircle size={14} style={{marginRight: '5px'}}/> Reject
+                            </button>
+                          </div>
+                        )}
+                        {b.status !== 'PENDING' && (
+                            <span style={{fontSize: '12px', color: '#94a3b8', fontStyle: 'italic'}}>Processed</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </section>
       </main>
 
       {modalOpen && (
         <div className="modal-overlay">
-          <div className="modal-content premium-glass-admin">
-            <h3>{adminAction === 'APPROVED' ? 'Approve Booking' : 'Reject Booking'}</h3>
-            <p>Booking ID: #{selectedBooking?.id}</p>
-            <p>Reason {adminAction === 'REJECTED' ? '(Required)' : '(Optional)'}:</p>
-            <textarea 
-              value={adminReason} 
-              onChange={(e) => setAdminReason(e.target.value)} 
-              placeholder="Enter your comments or reason..."
-            ></textarea>
-            <div className="modal-actions">
+          <div className="modal-content">
+            <h3>{adminAction === 'APPROVED' ? <CheckCircle color="#10b981" /> : <XCircle color="#ef4444" />} {adminAction === 'APPROVED' ? 'Approve Booking' : 'Reject Booking'}</h3>
+            <p style={{marginTop: '10px'}}>Processing Reference: <strong>#{selectedBooking?.id}</strong></p>
+            
+            <div style={{marginTop: '20px'}}>
+              <label style={{fontSize: '12px', fontWeight: '700', color: '#64748b', display: 'block', marginBottom: '8px'}}>ADMIN COMMENTS {adminAction === 'REJECTED' ? '(REQUIRED)' : '(OPTIONAL)'}:</label>
+              <textarea 
+                value={adminReason} 
+                onChange={(e) => setAdminReason(e.target.value)} 
+                placeholder="Add notes for the requester..."
+                style={{width: '100%', minHeight: '100px', padding: '12px', borderRadius: '10px', border: '1px solid #e2e8f0', fontFamily: 'inherit'}}
+              ></textarea>
+            </div>
+            
+            <div className="modal-actions" style={{marginTop: '25px'}}>
               <button onClick={() => setModalOpen(false)} className="cancel-s-btn">Cancel</button>
               <button onClick={submitAction} className={`confirm-${adminAction.toLowerCase()}-btn`}>
                 Confirm {adminAction === 'APPROVED' ? 'Approval' : 'Rejection'}
