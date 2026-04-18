@@ -58,20 +58,25 @@ const CreateTicket = () => {
     const files = Array.from(e.target.files);
     setErrorMsg('');
 
-    if (files.length > 3) {
-      setErrorMsg('You can only attach up to 3 images.');
-      return;
-    }
-
     const imageFiles = files.filter(file => file.type.startsWith('image/'));
     if (imageFiles.length !== files.length) {
       setErrorMsg('Only image files are allowed.');
       return;
     }
 
-    setSelectedFiles(imageFiles);
-    const filePreviews = imageFiles.map(file => URL.createObjectURL(file));
+    if (selectedFiles.length + imageFiles.length > 3) {
+      setErrorMsg('You can only attach up to 3 images in total.');
+      return;
+    }
+
+    const updatedFiles = [...selectedFiles, ...imageFiles];
+    setSelectedFiles(updatedFiles);
+    
+    const filePreviews = updatedFiles.map(file => URL.createObjectURL(file));
     setPreviews(filePreviews);
+    
+    // Clear the input so selecting the same file again works
+    e.target.value = '';
   };
 
   const removeFile = (index) => {

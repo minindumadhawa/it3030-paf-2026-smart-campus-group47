@@ -17,11 +17,6 @@ const UploadAttachment = ({ ticketId, onUploadSuccess, currentAttachmentCount })
     // Clear previous messages
     setMessage({ type: '', text: '' });
 
-    if (files.length > maxAllowed) {
-      setMessage({ type: 'error', text: `You can only add ${maxAllowed} more image(s).` });
-      return;
-    }
-
     // Filter only images
     const imageFiles = files.filter(file => file.type.startsWith('image/'));
     if (imageFiles.length !== files.length) {
@@ -29,11 +24,20 @@ const UploadAttachment = ({ ticketId, onUploadSuccess, currentAttachmentCount })
       return;
     }
 
-    setSelectedFiles(imageFiles);
+    if (selectedFiles.length + imageFiles.length > maxAllowed) {
+      setMessage({ type: 'error', text: `You can only add ${maxAllowed} more image(s) overall.` });
+      return;
+    }
+
+    const updatedFiles = [...selectedFiles, ...imageFiles];
+    setSelectedFiles(updatedFiles);
 
     // Create previews
-    const filePreviews = imageFiles.map(file => URL.createObjectURL(file));
+    const filePreviews = updatedFiles.map(file => URL.createObjectURL(file));
     setPreviews(filePreviews);
+    
+    // Clear input so same file can be selected again
+    e.target.value = '';
   };
 
   const handleUpload = async () => {
