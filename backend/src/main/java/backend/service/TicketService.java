@@ -153,23 +153,24 @@ public class TicketService {
             throw new UnauthorizedException("Access denied. Only Admins or the assigned Technician can update status.");
         }
 
-        ticket.setStatus(request.getStatus());
-
-        // SLA Timer logic: set resolvedAt for termial states
-        if (request.getStatus() == TicketStatus.RESOLVED || request.getStatus() == TicketStatus.CLOSED) {
-            if (ticket.getResolvedAt() == null) {
-                ticket.setResolvedAt(java.time.LocalDateTime.now());
-            }
-        } else {
-            // If moved back from resolved state, clear the timer
-            ticket.setResolvedAt(null);
-        }
-
         if (request.getStatus() == TicketStatus.REJECTED) {
             if (request.getRejectionReason() == null || request.getRejectionReason().trim().isEmpty()) {
                 throw new ValidationException("Rejection reason is required.");
             }
+            ticket.setStatus(TicketStatus.CLOSED); // Auto-close upon rejection
             ticket.setRejectionReason(request.getRejectionReason());
+        } else {
+            ticket.setStatus(request.getStatus());
+        }
+
+        // SLA Timer logic: set resolvedAt for terminal states
+        if (ticket.getStatus() == TicketStatus.RESOLVED || ticket.getStatus() == TicketStatus.CLOSED) {
+            if (ticket.getResolvedAt() == null) {
+                ticket.setResolvedAt(java.time.LocalDateTime.now());
+            }
+        } else {
+            // If moved back from resolved/closed state, clear the timer
+            ticket.setResolvedAt(null);
         }
         return mapToResponse(ticketRepository.save(ticket));
     }

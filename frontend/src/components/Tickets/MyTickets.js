@@ -38,10 +38,9 @@ const MyTickets = () => {
   const [priorityFilter, setPriorityFilter] = useState('ALL');
 
   const [stats, setStats] = useState({
-    OPEN: 0,
-    IN_PROGRESS: 0,
     RESOLVED: 0,
-    REJECTED: 0
+    REJECTED: 0,
+    CLOSED: 0
   });
 
   useEffect(() => {
@@ -90,7 +89,7 @@ const MyTickets = () => {
       setFilteredTickets(sortedData);
       
       // Calculate Stats
-      const counts = { OPEN: 0, IN_PROGRESS: 0, RESOLVED: 0, REJECTED: 0 };
+      const counts = { OPEN: 0, IN_PROGRESS: 0, RESOLVED: 0, REJECTED: 0, CLOSED: 0 };
       data.forEach(t => {
         if (counts[t.status] !== undefined) counts[t.status]++;
       });
@@ -196,6 +195,7 @@ const MyTickets = () => {
                 <option value="IN_PROGRESS">In Progress</option>
                 <option value="RESOLVED">Resolved</option>
                 <option value="REJECTED">Rejected</option>
+                <option value="CLOSED">Closed</option>
               </select>
             </div>
             <div className="filter-item">

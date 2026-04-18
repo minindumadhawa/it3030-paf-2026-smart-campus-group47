@@ -247,7 +247,7 @@ const TicketDetails = () => {
                 <div className="ticket-stepper">
                   {(() => {
                     const getStepIndex = (status, assignedStaff) => {
-                      if (status === 'CLOSED') return 4;
+                      if (status === 'CLOSED' || status === 'REJECTED') return 4;
                       if (status === 'RESOLVED') return 3;
                       if (status === 'IN_PROGRESS') return 2;
                       if (assignedStaff) return 1;
@@ -267,10 +267,10 @@ const TicketDetails = () => {
                           { label: 'Resolved', icon: <CheckCircle size={16} /> },
                           { label: 'Closed', icon: <CheckCircle size={16} /> },
                         ].map((step, index) => {
-                          const isCompleted = index < currentIndex || ticket.status === 'CLOSED' || (ticket.status === 'RESOLVED' && index <= 3);
-                          const isActive = index === currentIndex && ticket.status !== 'CLOSED' && (ticket.status !== 'RESOLVED' || index !== 3);
+                          const isCompleted = index < currentIndex || ticket.status === 'CLOSED' || ticket.status === 'REJECTED' || (ticket.status === 'RESOLVED' && index <= 3);
+                          const isActive = index === currentIndex && ticket.status !== 'CLOSED' && ticket.status !== 'REJECTED' && (ticket.status !== 'RESOLVED' || index !== 3);
                           // Special handling for terminal states
-                          const finalCompleted = ticket.status === 'CLOSED' || (ticket.status === 'RESOLVED' && index <= 3);
+                          const finalCompleted = ticket.status === 'CLOSED' || ticket.status === 'REJECTED' || (ticket.status === 'RESOLVED' && index <= 3);
 
                           return (
                             <div key={index} className={`step-item ${finalCompleted && index <= currentIndex ? 'completed' : ''} ${isActive ? 'active' : ''}`}>
@@ -360,13 +360,19 @@ const TicketDetails = () => {
                     </div>
                   </div>
 
-                  {/* Resolution Info */}
-                  {(ticket.status === 'REJECTED' || ticket.status === 'RESOLVED') && (
+                  {/* Resolution Info (Including Rejections) */}
+                  {(ticket.rejectionReason || ticket.resolutionNotes) && (
                     <div className="info-section" style={{marginTop: '2rem'}}>
-                      <h4><CheckCircle size={16} /> Resolution Information</h4>
-                      <div className={`description-box ${ticket.status === 'REJECTED' ? 'rejected-box' : 'resolved-box'}`}>
-                        <p><strong>{ticket.status === 'REJECTED' ? 'Rejection Reason:' : 'Resolution Notes:'}</strong></p>
-                        <p>{ticket.status === 'REJECTED' ? ticket.rejectionReason : ticket.resolutionNotes}</p>
+                      <h4>
+                        {ticket.rejectionReason ? <XCircle size={18} color="#ef4444" /> : <CheckCircle size={16} />} 
+                        {ticket.rejectionReason ? ' Submission Rejected' : ' Resolution Information'}
+                      </h4>
+                      <div className={`description-box ${ticket.rejectionReason ? 'rejected-box' : 'resolved-box'}`}>
+                        <p><strong>
+                          {ticket.rejectionReason ? <AlertCircle size={16} /> : null}
+                          {ticket.rejectionReason ? ' Rejection Reason:' : ' Resolution Notes:'}
+                        </strong></p>
+                        <p>{ticket.rejectionReason || ticket.resolutionNotes}</p>
                       </div>
                     </div>
                   )}
