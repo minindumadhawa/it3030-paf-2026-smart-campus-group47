@@ -149,6 +149,7 @@ const TicketManagement = () => {
               <option value="IN_PROGRESS">In Progress</option>
               <option value="RESOLVED">Resolved</option>
               <option value="REJECTED">Rejected</option>
+              <option value="CLOSED">Closed</option>
             </select>
           </div>
 

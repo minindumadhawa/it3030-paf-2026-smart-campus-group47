@@ -218,6 +218,7 @@
   .admin-status-select.status-in-progress { background-color: #fff7ed; border-color: #fed7aa; color: #c2410c; }
   .admin-status-select.status-resolved { background-color: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
   .admin-status-select.status-rejected { background-color: #fef2f2; border-color: #fecaca; color: #991b1b; }
+  .admin-status-select.status-closed { background-color: #f1f5f9; border-color: #cbd5e1; color: #1e293b; }
   
   /* Priority Color Modifiers */
   .priority-high { color: #ef4444; }

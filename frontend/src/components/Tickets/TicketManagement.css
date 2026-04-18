@@ -267,6 +267,7 @@
   .status-in-progress { background: #fff7ed; color: #c2410c; }
   .status-resolved { background: #f0fdf4; color: #16a34a; }
   .status-rejected { background: #fef2f2; color: #991b1b; }
+  .status-closed { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
   
   .manage-row-btn {
     background: #f1f5f9;
