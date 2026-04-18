@@ -94,6 +94,23 @@ const MyTickets = () => {
     });
   };
 
+  const calculateActiveTime = (createdAt) => {
+    if (!createdAt) return '';
+    const start = new Date(createdAt);
+    const now = new Date();
+    const diffMs = now - start;
+    const diffMins = Math.floor(diffMs / 60000);
+    const days = Math.floor(diffMins / 1440);
+    const hours = Math.floor((diffMins % 1440) / 60);
+    const mins = diffMins % 60;
+
+    let result = '';
+    if (days > 0) result += `${days}d `;
+    if (hours > 0) result += `${hours}h `;
+    result += `${mins}m`;
+    return result.trim();
+  };
+
   if (!user) return <div className="ticket-loading">Authenticating...</div>;
 
   return (
@@ -214,6 +231,7 @@ const MyTickets = () => {
                     <th>PRIORITY</th>
                     <th>STATUS</th>
                     <th>DATE</th>
+                    <th>DURATION</th>
                     <th>ACTION</th>
                   </tr>
                 </thead>
@@ -234,6 +252,11 @@ const MyTickets = () => {
                         </span>
                       </td>
                       <td className="date-cell">{formatDate(ticket.createdAt)}</td>
+                      <td>
+                        <span style={{ fontSize: '0.8rem', color: ticket.resolutionDuration ? '#16a34a' : '#F37021', fontWeight: '600' }}>
+                          {ticket.resolutionDuration || calculateActiveTime(ticket.createdAt)}
+                        </span>
+                      </td>
                       <td>
                         <button className="row-action-btn" onClick={() => navigate(`/tickets/${ticket.id}`)}>
                           View Details <ChevronRight size={14} />

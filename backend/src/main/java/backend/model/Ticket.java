@@ -47,6 +47,9 @@ public class Ticket {
     @Column
     private LocalDateTime updatedAt;
 
+    @Column
+    private LocalDateTime resolvedAt;
+
     // Many tickets belong to one user
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = true)
@@ -110,6 +113,9 @@ public class Ticket {
 
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
+    public LocalDateTime getResolvedAt() { return resolvedAt; }
+    public void setResolvedAt(LocalDateTime resolvedAt) { this.resolvedAt = resolvedAt; }
 
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }

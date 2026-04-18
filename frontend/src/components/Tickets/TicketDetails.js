@@ -182,6 +182,23 @@ const TicketDetails = () => {
     });
   };
 
+  const calculateActiveTime = (createdAt) => {
+    if (!createdAt) return '';
+    const start = new Date(createdAt);
+    const now = new Date();
+    const diffMs = now - start;
+    const diffTotalMins = Math.floor(diffMs / 60000);
+    const days = Math.floor(diffTotalMins / 1440);
+    const hours = Math.floor((diffTotalMins % 1440) / 60);
+    const mins = diffTotalMins % 60;
+
+    let result = '';
+    if (days > 0) result += `${days}d `;
+    if (hours > 0) result += `${hours}h `;
+    result += `${mins}m`;
+    return result.trim();
+  };
+
   if (!user) return <div className="ticket-loading">Authenticating...</div>;
 
   return (
@@ -232,9 +249,32 @@ const TicketDetails = () => {
                     <p className="ticket-id-label">Record Reference: #{ticket.id}</p>
                     <h1 className="ticket-title-heading">{ticket.category.replace('_', ' ')}</h1>
                   </div>
-                  <span className={`status-badge-large status-${ticket.status.toLowerCase().replace('_', '-')}`}>
-                    {statusIcons[ticket.status]} {ticket.status.replace('_', ' ')}
-                  </span>
+                  <div className="ticket-header-right" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '10px' }}>
+                    <span className={`status-badge-large status-${ticket.status.toLowerCase().replace('_', '-')}`}>
+                      {statusIcons[ticket.status]} {ticket.status.replace('_', ' ')}
+                    </span>
+                    
+                    {/* SLA Timer Display */}
+                    <div className="sla-timer-box" style={{ 
+                      fontSize: '0.85rem', 
+                      background: '#f8fafc', 
+                      padding: '5px 12px', 
+                      borderRadius: '8px', 
+                      border: '1px solid #e2e8f0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      color: '#475569',
+                      fontWeight: '600'
+                    }}>
+                      <Clock size={14} className="icon-orange" />
+                      {ticket.resolutionDuration ? (
+                        <span>Resolved in: <span style={{color: '#16a34a'}}>{ticket.resolutionDuration}</span></span>
+                      ) : (
+                        <span>Active for: <span style={{color: '#F37021'}}>{calculateActiveTime(ticket.createdAt)}</span></span>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 <div className="details-body">

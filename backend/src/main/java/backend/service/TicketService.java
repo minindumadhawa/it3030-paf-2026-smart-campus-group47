@@ -119,6 +119,7 @@ public class TicketService {
         }
 
         ticket.setStatus(TicketStatus.IN_PROGRESS);
+        ticket.setResolvedAt(null); // Clear resolvedAt if reassigned
         Ticket saved = ticketRepository.save(ticket);
 
         // Automatically post assignment message as a comment
@@ -153,6 +154,17 @@ public class TicketService {
         }
 
         ticket.setStatus(request.getStatus());
+
+        // SLA Timer logic: set resolvedAt for termial states
+        if (request.getStatus() == TicketStatus.RESOLVED || request.getStatus() == TicketStatus.CLOSED) {
+            if (ticket.getResolvedAt() == null) {
+                ticket.setResolvedAt(java.time.LocalDateTime.now());
+            }
+        } else {
+            // If moved back from resolved state, clear the timer
+            ticket.setResolvedAt(null);
+        }
+
         if (request.getStatus() == TicketStatus.REJECTED) {
             if (request.getRejectionReason() == null || request.getRejectionReason().trim().isEmpty()) {
                 throw new ValidationException("Rejection reason is required.");

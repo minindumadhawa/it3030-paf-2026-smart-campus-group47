@@ -23,6 +23,7 @@ public class TicketResponse {
     private String assignedStaffName;
     private Long technicianId;
     private String technicianName;
+    private String resolutionDuration;
     private java.util.List<TicketAttachmentResponse> attachments;
 
     // User info
@@ -59,6 +60,20 @@ public class TicketResponse {
             response.setTechnicianName(ticket.getTechnician().getFullName());
             // Optionally sync assignedStaffName for backward compatibility
             response.setAssignedStaffName(ticket.getTechnician().getFullName());
+        }
+
+        // Calculate resolution duration if resolved
+        if (ticket.getResolvedAt() != null && ticket.getCreatedAt() != null) {
+            java.time.Duration duration = java.time.Duration.between(ticket.getCreatedAt(), ticket.getResolvedAt());
+            long days = duration.toDays();
+            long hours = duration.toHours() % 24;
+            long minutes = duration.toMinutes() % 60;
+
+            StringBuilder sb = new StringBuilder();
+            if (days > 0) sb.append(days).append("d ");
+            if (hours > 0) sb.append(hours).append("h ");
+            if (minutes > 0 || sb.length() == 0) sb.append(minutes).append("m");
+            response.setResolutionDuration(sb.toString().trim());
         }
 
         return response;
@@ -114,6 +129,9 @@ public class TicketResponse {
 
     public String getTechnicianName() { return technicianName; }
     public void setTechnicianName(String technicianName) { this.technicianName = technicianName; }
+
+    public String getResolutionDuration() { return resolutionDuration; }
+    public void setResolutionDuration(String resolutionDuration) { this.resolutionDuration = resolutionDuration; }
 
     public java.util.List<TicketAttachmentResponse> getAttachments() { return attachments; }
     public void setAttachments(java.util.List<TicketAttachmentResponse> attachments) { this.attachments = attachments; }
