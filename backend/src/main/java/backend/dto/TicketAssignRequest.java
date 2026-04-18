@@ -6,6 +6,7 @@ public class TicketAssignRequest {
     private Long adminId;
     private Long adminUserId; // Legacy
     private String adminRole;
+    private String message;
 
     public TicketAssignRequest() {}
 
@@ -23,4 +24,7 @@ public class TicketAssignRequest {
 
     public String getAdminRole() { return adminRole; }
     public void setAdminRole(String adminRole) { this.adminRole = adminRole; }
+
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
 }

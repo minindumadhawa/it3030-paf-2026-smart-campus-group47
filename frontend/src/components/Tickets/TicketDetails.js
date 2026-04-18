@@ -9,6 +9,7 @@ import ticketService from '../../services/ticketService';
 import commentService from '../../services/commentService';
 import CommentSection from './CommentSection';
 import UploadAttachment from './UploadAttachment';
+import { useNotification } from '../../context/NotificationContext';
 import './TicketDetails.css';
 
 const statusIcons = {
@@ -26,6 +27,7 @@ const TicketDetails = () => {
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
+  const { showNotification } = useNotification();
   
   // Admin Action States
   const [staffName, setStaffName] = useState('');
@@ -37,6 +39,7 @@ const TicketDetails = () => {
   const [localStatus, setLocalStatus] = useState('');
   const [technicians, setTechnicians] = useState([]);
   const [selectedTechId, setSelectedTechId] = useState('');
+  const [assignmentMessage, setAssignmentMessage] = useState('');
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -80,17 +83,18 @@ const TicketDetails = () => {
   const handleAssign = async (e) => {
     e.preventDefault();
     if (!selectedTechId) {
-      alert('Please select a technician.');
+      showNotification('Please select a technician.', 'warning');
       return;
     }
 
     setAdminActionLoading(true);
     try {
-      await ticketService.assignStaff(id, user.id, user.role, '', selectedTechId);
-      alert('Technician assigned successfully!');
+      await ticketService.assignStaff(id, user.id, user.role, '', selectedTechId, assignmentMessage);
+      showNotification('Technician assigned successfully!', 'success');
+      setAssignmentMessage('');
       fetchTicketData(id, user.id, user.role);
     } catch (err) {
-      alert(err.message);
+      showNotification(err.message, 'error');
     } finally {
       setAdminActionLoading(false);
     }
@@ -101,12 +105,12 @@ const TicketDetails = () => {
     const trimmedReason = rejectionReason.trim();
 
     if (selectedStatus === 'RESOLVED' && trimmedNotes.length < 10) {
-      alert('⚠️ Resolution notes are too short. Please provide more detail (min 10 chars).');
+      showNotification('⚠️ Resolution notes are too short. Please provide more detail (min 10 chars).', 'warning');
       return;
     }
 
     if (selectedStatus === 'REJECTED' && trimmedReason.length < 10) {
-      alert('⚠️ Rejection reason is too short. Please provide more detail (min 10 chars).');
+      showNotification('⚠️ Rejection reason is too short. Please provide more detail (min 10 chars).', 'warning');
       return;
     }
 
@@ -130,13 +134,13 @@ const TicketDetails = () => {
         });
       }
       
-      alert(`Success: Ticket status changed to ${selectedStatus}`);
+      showNotification(`Success: Ticket status changed to ${selectedStatus}`, 'success');
       setShowStatusModal(false);
       setResolutionNotes('');
       setRejectionReason('');
       fetchTicketData(id, user.id, user.role);
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      showNotification(`Error: ${err.message}`, 'error');
     } finally {
       setAdminActionLoading(false);
     }
@@ -156,10 +160,10 @@ const TicketDetails = () => {
         });
       }
 
-      alert(`Success: Ticket status changed to ${newStatus}`);
+      showNotification(`Success: Ticket status changed to ${newStatus}`, 'success');
       fetchTicketData(id, user.id, user.role);
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      showNotification(`Error: ${err.message}`, 'error');
     } finally {
       setAdminActionLoading(false);
     }
@@ -323,19 +327,50 @@ const TicketDetails = () => {
                   
                   <div className="admin-section">
                     <label>Assign Specialized Technician</label>
-                    <form onSubmit={handleAssign} className="admin-form-group">
+                    <form onSubmit={handleAssign} className="admin-form-group" style={{ flexDirection: 'column', gap: '10px' }}>
                       <select 
                         value={selectedTechId}
                         onChange={(e) => setSelectedTechId(e.target.value)}
-                        style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0', background: '#f8fafc' }}
+                        style={{ 
+                          width: '100%', 
+                          padding: '10px', 
+                          borderRadius: '10px', 
+                          border: '1px solid #e2e8f0', 
+                          background: '#f8fafc',
+                          fontFamily: "'Inter', sans-serif",
+                          fontSize: '14px'
+                        }}
                       >
                         <option value="">Select Technician...</option>
                         {technicians.map(tech => (
                           <option key={tech.id} value={tech.id}>{tech.fullName}</option>
                         ))}
                       </select>
-                      <button type="submit" disabled={adminActionLoading || !selectedTechId} className="icon-btn">
-                        <ArrowRight size={18} />
+                      
+                      <textarea
+                        placeholder="Add a message for the technician (optional)..."
+                        value={assignmentMessage}
+                        onChange={(e) => setAssignmentMessage(e.target.value)}
+                        style={{ 
+                          width: '100%', 
+                          minHeight: '60px', 
+                          padding: '10px', 
+                          borderRadius: '10px', 
+                          border: '1px solid #e2e8f0', 
+                          background: '#f8fafc', 
+                          fontSize: '13px', 
+                          resize: 'vertical',
+                          fontFamily: "'Inter', sans-serif"
+                        }}
+                      />
+
+                      <button 
+                        type="submit" 
+                        disabled={adminActionLoading || !selectedTechId} 
+                        className="save-edit-btn"
+                        style={{ width: '100%', padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                      >
+                        <Send size={16} /> Confirm Assignment
                       </button>
                     </form>
                   </div>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useNotification } from '../../context/NotificationContext';
 import './Bookings.css';
 
 const MyBookings = () => {
@@ -7,6 +8,7 @@ const MyBookings = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -40,12 +42,13 @@ const MyBookings = () => {
           method: 'DELETE'
         });
         if (response.ok) {
+          showNotification('Booking cancelled successfully.', 'success');
           fetchBookings(user.id);
         } else {
-          alert('Failed to cancel the booking.');
+          showNotification('Failed to cancel the booking.', 'error');
         }
       } catch (error) {
-        alert('An error occurred while canceling.');
+        showNotification('An error occurred while canceling.', 'error');
       }
     }
   };

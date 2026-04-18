@@ -15,10 +15,12 @@ import BookingForm from "./components/Bookings/BookingForm";
 import MyBookings from "./components/Bookings/MyBookings";
 import AdminBookingManagement from "./components/Bookings/AdminBookingManagement";
 import TechnicianDashboard from "./components/Technician/TechnicianDashboard";
+import { NotificationProvider } from "./context/NotificationContext";
+
 function App(){
   return (
-    <div>
-      <React.Fragment>
+    <NotificationProvider>
+      <div className="app">
         <Routes>
           <Route path="/" element={<Home></Home>}/>
           <Route path="/login" element={<LoginPage></LoginPage>}/>
@@ -39,8 +41,8 @@ function App(){
           {/* Technician Portal */}
           <Route path="/technician-dashboard" element={<TechnicianDashboard></TechnicianDashboard>}/>
         </Routes>
-      </React.Fragment>
-    </div>
+      </div>
+    </NotificationProvider>
   );
 }
 

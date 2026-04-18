@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useNotification } from '../../context/NotificationContext';
 import './Bookings.css';
 
 const AdminBookingManagement = () => {
@@ -11,7 +12,7 @@ const AdminBookingManagement = () => {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [adminAction, setAdminAction] = useState(null); // 'APPROVED' or 'REJECTED'
   const [adminReason, setAdminReason] = useState('');
-  
+  const { showNotification } = useNotification();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,7 +52,7 @@ const AdminBookingManagement = () => {
 
   const submitAction = async () => {
     if (adminAction === 'REJECTED' && !adminReason.trim()) {
-      alert("A reason is required when rejecting a booking.");
+      showNotification("A reason is required when rejecting a booking.", "warning");
       return;
     }
 
@@ -68,14 +69,15 @@ const AdminBookingManagement = () => {
       });
 
       if (response.ok) {
+        showNotification(`Booking ${adminAction.toLowerCase()} successfully.`, "success");
         setModalOpen(false);
         fetchBookings();
       } else {
         const errData = await response.json();
-        alert(errData.error || 'Failed to update status.');
+        showNotification(errData.error || 'Failed to update status.', "error");
       }
     } catch (error) {
-      alert('An error occurred.');
+      showNotification('An error occurred.', "error");
     }
   };
 

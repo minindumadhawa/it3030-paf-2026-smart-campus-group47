@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNotification } from '../../context/NotificationContext';
 import './Bookings.css';
 
 const BookingForm = () => {
@@ -7,6 +8,7 @@ const BookingForm = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const { showNotification } = useNotification();
 
   // Prefill resource metadata if passed via state
   const resourceParams = location.state?.resource;
@@ -67,6 +69,7 @@ const BookingForm = () => {
     const validationError = validate();
     if (validationError) {
       setError(validationError);
+      showNotification(validationError, 'warning');
       return;
     }
 
@@ -92,14 +95,17 @@ const BookingForm = () => {
 
       if (response.ok) {
         setSuccess(true);
-        window.alert("Booking requested successfully! Your request has been sent for admin approval.");
+        showNotification("Booking requested successfully! Your request has been sent for admin approval.", "success");
         navigate('/user/bookings');
       } else {
         const errData = await response.json();
-        setError(errData.error || 'Failed to create booking. Time slot might be unavailable.');
+        const msg = errData.error || 'Failed to create booking. Time slot might be unavailable.';
+        setError(msg);
+        showNotification(msg, 'error');
       }
     } catch (err) {
       setError('A network error occurred.');
+      showNotification('A network error occurred.', 'error');
     }
   };
 

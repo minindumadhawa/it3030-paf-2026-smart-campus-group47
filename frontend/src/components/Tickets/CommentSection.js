@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MessageSquare, Send, Clock, Edit2, Trash2, X, Check } from 'lucide-react';
 import commentService from '../../services/commentService';
+import { useNotification } from '../../context/NotificationContext';
 import './CommentSection.css';
 
 const CommentSection = ({ ticketId }) => {
@@ -8,7 +9,7 @@ const CommentSection = ({ ticketId }) => {
     const [newComment, setNewComment] = useState('');
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
-    const [message, setMessage] = useState({ type: '', text: '' });
+    const { showNotification } = useNotification();
     const [user, setUser] = useState(null);
 
     // Editing state
@@ -44,17 +45,16 @@ const CommentSection = ({ ticketId }) => {
         const trimmedContent = newComment.trim();
 
         if (trimmedContent.length < 5) {
-            setMessage({ type: 'error', text: 'Comment is too short. Please type at least 5 characters.' });
+            showNotification('Comment is too short. Please type at least 5 characters.', 'warning');
             return;
         }
 
         if (!user) {
-            setMessage({ type: 'error', text: 'Please log in to post a comment.' });
+            showNotification('Please log in to post a comment.', 'error');
             return;
         }
 
         setActionLoading(true);
-        setMessage({ type: '', text: '' });
 
         try {
             const commentData = {
@@ -65,11 +65,10 @@ const CommentSection = ({ ticketId }) => {
 
             await commentService.addComment(ticketId, commentData);
             setNewComment('');
-            setMessage({ type: 'success', text: 'Comment added successfully!' });
+            showNotification('Comment added successfully!', 'success');
             fetchComments();
-            setTimeout(() => setMessage({ type: '', text: '' }), 3000);
         } catch (err) {
-            setMessage({ type: 'error', text: err.message || 'Failed to post comment.' });
+            showNotification(err.message || 'Failed to post comment.', 'error');
         } finally {
             setActionLoading(false);
         }
@@ -87,10 +86,9 @@ const CommentSection = ({ ticketId }) => {
             });
             setEditingCommentId(null);
             fetchComments();
-            setMessage({ type: 'success', text: 'Comment updated!' });
-            setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+            showNotification('Comment updated!', 'success');
         } catch (err) {
-            alert(err.message);
+            showNotification(err.message, 'error');
         } finally {
             setActionLoading(false);
         }
@@ -102,10 +100,9 @@ const CommentSection = ({ ticketId }) => {
         try {
             await commentService.deleteComment(commentId, user.id, user.role);
             setComments(comments.filter(c => c.id !== commentId));
-            setMessage({ type: 'success', text: 'Comment deleted.' });
-            setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+            showNotification('Comment deleted.', 'success');
         } catch (err) {
-            alert(err.message);
+            showNotification(err.message, 'error');
         }
     };
 
@@ -126,12 +123,6 @@ const CommentSection = ({ ticketId }) => {
     return (
         <div className="comment-section-container">
             <h3><MessageSquare size={22} className="icon-orange" /> Discussion & Updates</h3>
-
-            {message.text && (
-                <div className={`comment-alert alert-${message.type}`}>
-                    {message.text}
-                </div>
-            )}
 
             <div className="comments-list">
                 {loading ? (

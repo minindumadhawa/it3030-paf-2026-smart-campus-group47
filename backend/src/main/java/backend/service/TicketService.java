@@ -25,6 +25,9 @@ public class TicketService {
     private UserRepository userRepository;
 
     @Autowired
+    private CommentService commentService;
+
+    @Autowired
     private backend.repository.TicketAttachmentRepository attachmentRepository;
 
     @Autowired
@@ -116,7 +119,18 @@ public class TicketService {
         }
 
         ticket.setStatus(TicketStatus.IN_PROGRESS);
-        return mapToResponse(ticketRepository.save(ticket));
+        Ticket saved = ticketRepository.save(ticket);
+
+        // Automatically post assignment message as a comment
+        if (request.getMessage() != null && !request.getMessage().trim().isEmpty()) {
+            CommentRequest commentRequest = new CommentRequest();
+            commentRequest.setUserId(request.getAdminId() != null ? request.getAdminId() : request.getAdminUserId());
+            commentRequest.setRole("ADMIN");
+            commentRequest.setContent("📌 [Task Assigned to " + saved.getAssignedStaffName() + "]: " + request.getMessage());
+            commentService.addComment(saved.getId(), commentRequest);
+        }
+
+        return mapToResponse(saved);
     }
 
     public List<TicketResponse> getTicketsForTechnician(Long technicianId) {

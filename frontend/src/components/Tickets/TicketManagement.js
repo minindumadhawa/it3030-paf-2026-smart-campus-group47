@@ -210,6 +210,7 @@ const TicketManagement = () => {
                     <th>LOCATION</th>
                     <th>PRIORITY</th>
                     <th>STATUS</th>
+                    <th>ASSIGNED TO</th>
                     <th>REPORTED BY</th>
                     <th>DATE</th>
                     <th>ACTION</th>
@@ -233,6 +234,11 @@ const TicketManagement = () => {
                       <td>
                         <span className={`pill-status status-${ticket.status.toLowerCase().replace('_', '-')}`}>
                           {ticket.status.replace('_', ' ')}
+                        </span>
+                      </td>
+                      <td>
+                        <span className="staff-text" style={{ color: '#1e293b', fontWeight: '600' }}>
+                          {ticket.assignedStaffName || <span style={{color: '#94a3b8', fontWeight: '400'}}>Pending</span>}
                         </span>
                       </td>
                       <td className="reporter-col" style={{ color: '#1e293b', fontWeight: '600' }}>{ticket.userFullName}</td>

@@ -44,7 +44,7 @@ const ticketService = {
   },
 
   // [Management] Assign a technician/staff member
-  assignStaff: async (ticketId, adminId, adminRole, staffName, technicianId = null) => {
+  assignStaff: async (ticketId, adminId, adminRole, staffName, technicianId = null, message = '') => {
     const response = await fetch(`${API_URL}/tickets/${ticketId}/assign`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -52,7 +52,9 @@ const ticketService = {
         assignedStaffName: staffName,
         technicianId: technicianId,
         adminUserId: adminId,
-        adminRole: adminRole
+        adminId: adminId,
+        adminRole: adminRole,
+        message: message
       }),
     });
     if (!response.ok) {
