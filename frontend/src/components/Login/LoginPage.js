@@ -127,7 +127,7 @@ const LoginPage = () => {
           </div>
 
           <div className="google-login-container" style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-            <GoogleOAuthProvider clientId="1234567890-mockclientid.apps.googleusercontent.com">
+            <GoogleOAuthProvider clientId="1002093705381-vj3e2e01n778a1hv3r8u9jvdntevssd2.apps.googleusercontent.com">
               <GoogleLogin
                 onSuccess={handleGoogleSuccess}
                 onError={() => {
