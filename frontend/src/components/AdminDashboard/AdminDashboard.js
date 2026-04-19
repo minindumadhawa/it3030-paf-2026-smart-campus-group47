@@ -3,13 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Shield, Layout, Activity, FileText, 
   UserCheck, Box, LogOut, ArrowRight, 
-  Settings, Users, Briefcase
+  Settings, Users, Briefcase, Trophy, AlertTriangle
 } from 'lucide-react';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [admin, setAdmin] = useState(null);
+  const [analytics, setAnalytics] = useState({
+    topResource: 'Loading...',
+    outOfServiceCount: 0
+  });
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -24,6 +28,51 @@ const AdminDashboard = () => {
       navigate('/login');
     }
   }, [navigate]);
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const [resourcesRes, bookingsRes] = await Promise.all([
+          fetch('http://localhost:8080/api/resources'),
+          fetch('http://localhost:8080/api/bookings')
+        ]);
+        if (resourcesRes.ok && bookingsRes.ok) {
+          const resources = await resourcesRes.json();
+          const bookings = await bookingsRes.json();
+
+          const outOfService = resources.filter(r => r.status === 'OUT_OF_SERVICE').length;
+          
+          let topResourceName = 'None';
+          if (bookings.length > 0) {
+            const counts = {};
+            bookings.forEach(b => {
+              if (b.resourceName) {
+                counts[b.resourceName] = (counts[b.resourceName] || 0) + 1;
+              }
+            });
+            if (Object.keys(counts).length > 0) {
+              topResourceName = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
+            }
+          }
+
+          setAnalytics({
+            topResource: topResourceName,
+            outOfServiceCount: outOfService
+          });
+        }
+      } catch (error) {
+         console.error('Error fetching analytics:', error);
+         setAnalytics({
+           topResource: 'Error',
+           outOfServiceCount: 'Error'
+         });
+      }
+    };
+    
+    if (admin) {
+       fetchAnalytics();
+    }
+  }, [admin]);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -60,6 +109,24 @@ const AdminDashboard = () => {
         </header>
 
         <section className="admin-dashboard-widgets">
+          <div className="admin-premium-card">
+            <h3><Trophy className="icon-orange" size={20} /> Top Used Resource</h3>
+            <p><strong>Resource Name:</strong> {analytics.topResource}</p>
+            <p><strong>Metric:</strong> Highest booking frequency</p>
+            <span className="status-badge green-badge">Analytics Generated</span>
+          </div>
+
+          <div className="admin-premium-card">
+            <h3><AlertTriangle className="icon-orange" size={20} /> Currently Unavailable</h3>
+            <p><strong>Broken / Maintenance:</strong> {analytics.outOfServiceCount} items</p>
+            <p><strong>Action:</strong> Requires technician review</p>
+            {analytics.outOfServiceCount > 0 ? (
+                <span className="status-badge orange-badge">Attention Needed</span>
+            ) : (
+                <span className="status-badge green-badge">All Systems Nominal</span>
+            )}
+          </div>
+
           <div className="admin-premium-card">
             <h3><Activity className="icon-orange" size={20} /> System Status</h3>
             <p><strong>Environment:</strong> Production</p>
