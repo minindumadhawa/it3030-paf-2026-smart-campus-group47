@@ -24,6 +24,8 @@ public class Resource {
     @Column(nullable = false)
     private String status; // ACTIVE, OUT_OF_SERVICE
 
+    private String imageUrl;
+
     public Resource() {}
 
     public Long getId() { return id; }
@@ -46,4 +48,7 @@ public class Resource {
     
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }

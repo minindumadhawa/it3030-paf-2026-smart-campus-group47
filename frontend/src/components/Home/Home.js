@@ -1,8 +1,8 @@
 import React from 'react';
 import './Home.css';
 import { Building2, Wrench, Calendar, Bell, ChevronRight, UserCircle } from 'lucide-react';
-import logo from '../../images/SLIIT.png';
 import { useNavigate } from 'react-router-dom';
+import campusOfficeImg from '../../images/campus_office.png';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -11,7 +11,9 @@ const Home = () => {
       {/* Navigation Bar */}
       <nav className="navbar">
         <div className="nav-brand">
-          <img src={logo} alt="SLIIT Logo" className="navbar-logo" />
+          <div className="brand-logo">
+            <span className="logo-text">SLIIT</span>
+          </div>
           <span className="brand-title">Smart Campus Operations Hub</span>
         </div>
         <div className="nav-links">
@@ -42,6 +44,7 @@ const Home = () => {
           </div>
         </div>
         <div className="hero-visual">
+          <img src={campusOfficeImg} alt="Campus Office" className="hero-image" />
           {/* Decorative glass elements for the visual side */}
           <div className="glass-card decorative-card card-1">
             <Calendar className="card-icon" size={32} />
@@ -66,7 +69,7 @@ const Home = () => {
           <h2>Our Core Services</h2>
           <p>Streamlined access to essential campus operations</p>
         </div>
-
+        
         <div className="services-grid">
           {/* Facility Bookings Card */}
           <div className="service-card interactive-card">

@@ -26,6 +26,9 @@ public class UserController {
     @Autowired
     private AdminRepository adminRepository;
 
+    @Autowired
+    private backend.repository.TechnicianRepository technicianRepository;
+
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody User user) {
         Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
@@ -57,7 +60,7 @@ public class UserController {
             }
         }
 
-        // Otherwise check if the email belongs to a User
+        // Then check if the email belongs to a User
         Optional<User> userOptional = userRepository.findByEmail(loginRequest.getEmail());
         if (userOptional.isPresent()) {
             User existingUser = userOptional.get();
@@ -67,6 +70,25 @@ public class UserController {
                 response.put("fullName", existingUser.getFullName());
                 response.put("email", existingUser.getEmail());
                 response.put("role", "USER");
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else {
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("error", "Invalid password");
+                return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+            }
+        }
+
+        // Finally check if the email belongs to a Technician
+        Optional<backend.model.Technician> technicianOptional = technicianRepository.findByEmail(loginRequest.getEmail());
+        if (technicianOptional.isPresent()) {
+            backend.model.Technician existingTech = technicianOptional.get();
+            if (existingTech.getPassword().equals(loginRequest.getPassword())) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("id", existingTech.getId());
+                response.put("fullName", existingTech.getFullName());
+                response.put("email", existingTech.getEmail());
+                response.put("specialization", existingTech.getSpecialization());
+                response.put("role", "TECHNICIAN");
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
                 Map<String, String> errorResponse = new HashMap<>();

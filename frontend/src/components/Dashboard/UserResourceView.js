@@ -95,6 +95,7 @@ const UserResourceView = () => {
                     <th>Capacity</th>
                     <th>Location</th>
                     <th>Available Times</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -103,13 +104,31 @@ const UserResourceView = () => {
                   ) : (
                     filteredResources.map(res => (
                       <tr key={res.id}>
-                        <td><strong>{res.name}</strong></td>
+                        <td style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                          {res.imageUrl ? (
+                            <img src={res.imageUrl} alt={res.name} style={{width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover'}} />
+                          ) : (
+                            <div style={{width: '40px', height: '40px', borderRadius: '8px', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                              <span style={{color: '#94a3b8', fontSize: '10px'}}>No Img</span>
+                            </div>
+                          )}
+                          <strong>{res.name}</strong>
+                        </td>
                         <td>
                            <span className="category-pill">{res.type.replace('_', ' ')}</span>
                         </td>
                         <td>{res.capacity || 'N/A'}</td>
                         <td>{res.location}</td>
                         <td className="time-col">{res.availabilityWindows}</td>
+                        <td>
+                          <button 
+                            className="dash-action-btn primary" 
+                            style={{padding: '6px 12px', fontSize: '0.9rem'}}
+                            onClick={() => navigate(`/user/bookings/new/${res.id}`, { state: { resource: res } })}
+                          >
+                            Book
+                          </button>
+                        </td>
                       </tr>
                     ))
                   )}

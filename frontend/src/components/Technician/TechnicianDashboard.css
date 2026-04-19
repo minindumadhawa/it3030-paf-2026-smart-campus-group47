@@ -1,0 +1,262 @@
+.tech-dashboard-container {
+    min-height: 100vh;
+    background-color: #f8fafc;
+    color: #1e293b;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .tech-nav {
+    background: white;
+    padding: 1rem 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #f1f5f9;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  
+  .nav-brand {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .icon-orange { color: #f97316; }
+  
+  .user-profile-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .user-info-text {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+  }
+  
+  .user-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #1e293b;
+  }
+  
+  .user-role {
+    font-size: 0.75rem;
+    color: #64748b;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  
+  .logout-btn-minimal {
+    background: #f1f5f9;
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.2s;
+  }
+  
+  .logout-btn-minimal:hover {
+    background: #fee2e2;
+    color: #ef4444;
+  }
+  
+  .tech-main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2.5rem 2%;
+  }
+  
+  .tech-welcome-section h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #0f172a;
+  }
+  
+  .tech-welcome-section p {
+    color: #64748b;
+    margin-top: 0.5rem;
+  }
+  
+  .tech-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin: 2.5rem 0;
+  }
+  
+  .tech-stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9;
+  }
+  
+  .stat-icon-bg {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .stat-icon-bg.total { background: #eff6ff; color: #2563eb; }
+  .stat-icon-bg.pending { background: #fff7ed; color: #f97316; }
+  .stat-icon-bg.completed { background: #f0fdf4; color: #16a34a; }
+  
+  .stat-info h3 { font-size: 1.5rem; font-weight: 800; }
+  .stat-info p { font-size: 0.85rem; color: #64748b; font-weight: 500; }
+  
+  .tech-tickets-section {
+    margin-top: 3rem;
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .section-header h2 { font-size: 1.25rem; font-weight: 700; color: #1e293b; }
+  
+  .refresh-btn-small {
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .refresh-btn-small:hover { border-color: #f97316; color: #f97316; }
+  
+  .tech-ticket-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .tech-ticket-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .tech-ticket-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+  }
+  
+  .ticket-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .prio-pill {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+  .prio-pill.urgent { background: #fee2e2; color: #ef4444; }
+  .prio-pill.high { background: #ffedd5; color: #f97316; }
+  .prio-pill.medium { background: #e0f2fe; color: #0ea5e9; }
+  .prio-pill.low { background: #f1f5f9; color: #64748b; }
+  
+  .ticket-id { font-size: 0.85rem; color: #94a3b8; font-weight: 500; }
+  
+  .ticket-cat { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; color: #1e293b; }
+  
+  .ticket-desc-snippet {
+    font-size: 0.9rem;
+    color: #64748b;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+  }
+  
+  .ticket-meta-footer {
+    display: flex;
+    gap: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #f8fafc;
+    margin-bottom: 1.5rem;
+  }
+  
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    font-weight: 500;
+  }
+  
+  .view-details-action {
+    background: #1e293b;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s;
+  }
+  
+  .view-details-action:hover {
+    background: #f97316;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+  }
+  
+  .empty-tech-state {
+    padding: 5rem;
+    background: white;
+    border-radius: 20px;
+    text-align: center;
+    color: #94a3b8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    border: 2px dashed #e2e8f0;
+  }
+  
+  .tech-loading {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
+    font-weight: 600;
+    color: #64748b;
+  }
+  

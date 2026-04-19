@@ -1,0 +1,468 @@
+.ticket-page-container {
+    min-height: 100vh;
+    background-color: #f8fafc;
+    color: #1e293b;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .details-main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 5% 5rem;
+  }
+  
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #64748b;
+    text-decoration: none;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    transition: color 0.2s;
+  }
+  
+  .back-link:hover { color: #F37021; }
+  
+  .detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 2rem;
+    align-items: start;
+  }
+  
+  /* Main Details Card */
+  .details-card {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  }
+  
+  .details-header {
+    background: #0b2239;
+    padding: 2.5rem;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .ticket-id-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 0.5rem;
+  }
+  
+  .ticket-title-heading {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -0.5px;
+    text-transform: capitalize;
+  }
+  
+  .status-badge-large {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .status-badge-large svg {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+  }
+  
+  .details-body {
+    padding: 2.5rem;
+  }
+  
+  .info-sections-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.5rem;
+  }
+  
+  .info-section h4 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #94a3b8;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 0.5rem;
+  }
+  
+  .detail-item {
+    margin-bottom: 1.5rem;
+  }
+  
+  .detail-item-label {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 0.4rem;
+    display: block;
+  }
+  
+  .detail-item-value {
+    font-weight: 600;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .description-box {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    line-height: 1.7;
+    color: #334155;
+    margin-bottom: 2rem;
+  }
+  
+  /* Sidebar Admin Panel */
+  .admin-sidebar {
+    position: sticky;
+    top: 6rem;
+  }
+  
+  .admin-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .admin-card h3 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #0b2239;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  
+  .admin-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  
+  .admin-section label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #64748b;
+    display: block;
+    margin-bottom: 1rem;
+  }
+  
+  .admin-form-group {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .admin-form-group input {
+    flex: 1;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    font-size: 0.9rem;
+  }
+  
+  /* Status Dropdown - New Premium Style */
+  .status-dropdown-wrapper {
+    position: relative;
+    width: 100%;
+  }
+  
+  .admin-status-select {
+    width: 100%;
+    padding: 0.85rem 1.25rem;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    background: #ffffff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #1e293b;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    appearance: none; /* Custom arrow style */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.25rem;
+  }
+  
+  .admin-status-select:hover {
+    border-color: #F37021;
+    box-shadow: 0 4px 12px rgba(243, 112, 33, 0.1);
+  }
+  
+  .admin-status-select:focus {
+    border-color: #F37021;
+    box-shadow: 0 0 0 4px rgba(243, 112, 33, 0.1);
+  }
+  
+  /* Color Coding for Select States */
+  .admin-status-select.status-open { background-color: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+  .admin-status-select.status-in-progress { background-color: #fff7ed; border-color: #fed7aa; color: #c2410c; }
+  .admin-status-select.status-resolved { background-color: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
+  .admin-status-select.status-rejected { background-color: #fef2f2; border-color: #fecaca; color: #991b1b; }
+  .admin-status-select.status-closed { background-color: #f1f5f9; border-color: #cbd5e1; color: #1e293b; }
+  
+  /* Priority Color Modifiers & Badges */
+  .priority-badge {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .priority-urgent { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+  .priority-high { background: #ffedd5; color: #9a3412; border: 1px solid #fed7aa; }
+  .priority-medium { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+  .priority-low { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
+  
+  .icon-orange { color: #F37021; }
+  
+  /* Attachment Gallery Styles */
+  .attachment-gallery {
+    margin: 1.5rem 0;
+  }
+  
+  .image-grid-small {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.75rem;
+  }
+  
+  .img-thumb-link {
+    display: block;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    transition: transform 0.2s;
+  }
+  
+  .img-thumb-link:hover {
+    transform: scale(1.05);
+    border-color: #F37021;
+  }
+  
+  .img-thumb-link img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .empty-state-text {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    text-align: center;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 8px;
+  }
+  
+  @media (max-width: 1024px) {
+    .detail-layout {
+      grid-template-columns: 1fr;
+    }
+    
+    .admin-sidebar {
+      position: static;
+    }
+  }
+
+  /* Modal Overlay & Content */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .modal-content {
+    background: white;
+    width: 100%;
+    max-width: 500px;
+    padding: 2.5rem;
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .modal-content h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+  }
+
+  .modal-actions button {
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .cancel-edit-btn {
+    background: #f1f5f9;
+    border: none;
+    color: #64748b;
+  }
+
+  .cancel-edit-btn:hover {
+    background: #e2e8f0;
+    color: #475569;
+  }
+
+  .save-edit-btn {
+    background: #F37021;
+    border: none;
+    color: white;
+    box-shadow: 0 4px 12px rgba(243, 112, 33, 0.2);
+  }
+
+  .save-edit-btn:hover {
+    background: #e65e00;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(243, 112, 33, 0.3);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  /* --- Lifecycle Stepper Styles --- */
+  .ticket-stepper-container {
+    background: white;
+    padding: 2.5rem 1.5rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  }
+
+  .ticket-stepper {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* Background Line */
+  .ticket-stepper::before {
+    content: '';
+    position: absolute;
+    top: 24px;
+    left: 10%;
+    right: 10%;
+    height: 3px;
+    background: #e2e8f0;
+    z-index: 1;
+  }
+
+  .step-item {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+  }
+
+  .step-icon-wrapper {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    transition: all 0.3s ease;
+    margin-bottom: 12px;
+  }
+
+  .step-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    text-align: center;
+  }
+
+  /* Active/Completed States */
+  .step-item.active .step-icon-wrapper {
+    border-color: #F37021;
+    color: #F37021;
+    box-shadow: 0 0 15px rgba(243, 112, 33, 0.3);
+    transform: scale(1.1);
+  }
+
+  .step-item.active .step-label {
+    color: #0b2239;
+  }
+
+  .step-item.completed .step-icon-wrapper {
+    background: #10b981;
+    border-color: #10b981;
+    color: white;
+  }
+
+  .step-item.completed .step-label {
+    color: #059669;
+  }
+
+  /* Connection Line progress */
+  .step-line-progress {
+    position: absolute;
+    top: 24px;
+    left: 10%;
+    height: 3px;
+    background: #10b981;
+    z-index: 1;
+    transition: width 0.5s ease;
+  }
