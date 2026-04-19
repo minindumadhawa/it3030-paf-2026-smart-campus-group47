@@ -12,10 +12,12 @@ const ResourceManagement = () => {
   const navigate = useNavigate();
   const [resources, setResources] = useState([]);
   const [formData, setFormData] = useState({
-    name: '', type: 'LECTURE_HALL', capacity: '', location: '', availabilityWindows: '', status: 'ACTIVE'
+    name: '', type: 'LECTURE_HALL', capacity: '', location: '', availabilityWindows: '', status: 'ACTIVE', imageUrl: ''
   });
   const [editId, setEditId] = useState(null);
   const [notification, setNotification] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Filtering states
   const [filterType, setFilterType] = useState('ALL');
@@ -63,30 +65,53 @@ const ResourceManagement = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const isUpdate = editId !== null;
-    const url = isUpdate ? `http://localhost:8080/api/resources/${editId}` : 'http://localhost:8080/api/resources';
-    const method = isUpdate ? 'PUT' : 'POST';
+    setIsUploading(true);
+    let currentImageUrl = formData.imageUrl;
 
     try {
+      if (selectedFile) {
+        const uploadData = new FormData();
+        uploadData.append("file", selectedFile);
+        const uploadRes = await fetch('http://localhost:8080/api/resources/upload-image', {
+          method: 'POST',
+          body: uploadData
+        });
+        if (uploadRes.ok) {
+          const result = await uploadRes.json();
+          currentImageUrl = result.url;
+        } else {
+          throw new Error('Image upload failed');
+        }
+      }
+
+      const payload = { ...formData, imageUrl: currentImageUrl };
+      const isUpdate = editId !== null;
+      const url = isUpdate ? `http://localhost:8080/api/resources/${editId}` : 'http://localhost:8080/api/resources';
+      const method = isUpdate ? 'PUT' : 'POST';
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
       if (response.ok) {
         setNotification(isUpdate ? 'Resource updated successfully!' : 'Resource added successfully!');
-        setFormData({ name: '', type: 'LECTURE_HALL', capacity: '', location: '', availabilityWindows: '', status: 'ACTIVE' });
+        setFormData({ name: '', type: 'LECTURE_HALL', capacity: '', location: '', availabilityWindows: '', status: 'ACTIVE', imageUrl: '' });
+        setSelectedFile(null);
         setEditId(null);
         fetchResources();
         setTimeout(() => setNotification(''), 3000);
       }
     } catch (err) {
       setNotification('An error occurred while saving.');
+    } finally {
+      setIsUploading(false);
     }
   };
 
   const handleEdit = (resource) => {
     setFormData(resource);
+    setSelectedFile(null);
     setEditId(resource.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -174,6 +199,11 @@ const ResourceManagement = () => {
                 <input type="text" name="location" value={formData.location} onChange={handleChange} required placeholder="e.g. Building C, Floor 2" />
               </div>
               <div className="form-group">
+                <label>Resource Image</label>
+                <input type="file" accept="image/*" onChange={(e) => setSelectedFile(e.target.files[0])} />
+                {formData.imageUrl && !selectedFile && <small style={{display: 'block', marginTop: '5px', color: '#64748b'}}>Current image exists. Upload a new one to replace.</small>}
+              </div>
+              <div className="form-group">
                 <label>Availability Windows</label>
                 <input type="text" name="availabilityWindows" value={formData.availabilityWindows} onChange={handleChange} required placeholder="e.g. 08:00 - 18:00" />
               </div>
@@ -185,11 +215,14 @@ const ResourceManagement = () => {
                 </select>
               </div>
               <div className="form-actions">
-                <button type="submit" className="save-btn">{editId ? 'Update Resource' : 'Add Resource'}</button>
+                <button type="submit" className="save-btn" disabled={isUploading}>
+                  {isUploading ? 'Uploading...' : (editId ? 'Update Resource' : 'Add Resource')}
+                </button>
                 {editId && (
                   <button type="button" className="cancel-btn" onClick={() => { 
                     setEditId(null); 
-                    setFormData({ name: '', type: 'LECTURE_HALL', capacity: '', location: '', availabilityWindows: '', status: 'ACTIVE' }); 
+                    setSelectedFile(null);
+                    setFormData({ name: '', type: 'LECTURE_HALL', capacity: '', location: '', availabilityWindows: '', status: 'ACTIVE', imageUrl: '' }); 
                   }}>Cancel</button>
                 )}
               </div>
@@ -248,7 +281,16 @@ const ResourceManagement = () => {
                   ) : (
                     filteredResources.map(res => (
                       <tr key={res.id}>
-                        <td><strong>{res.name}</strong></td>
+                        <td style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                          {res.imageUrl ? (
+                            <img src={res.imageUrl} alt={res.name} style={{width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover'}} />
+                          ) : (
+                            <div style={{width: '40px', height: '40px', borderRadius: '8px', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                              <Layout size={20} color="#94a3b8" />
+                            </div>
+                          )}
+                          <strong>{res.name}</strong>
+                        </td>
                         <td>{res.type.replace('_', ' ')}</td>
                         <td>{res.capacity || 'N/A'}</td>
                         <td>{res.location}</td>

@@ -104,7 +104,16 @@ const UserResourceView = () => {
                   ) : (
                     filteredResources.map(res => (
                       <tr key={res.id}>
-                        <td><strong>{res.name}</strong></td>
+                        <td style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                          {res.imageUrl ? (
+                            <img src={res.imageUrl} alt={res.name} style={{width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover'}} />
+                          ) : (
+                            <div style={{width: '40px', height: '40px', borderRadius: '8px', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                              <span style={{color: '#94a3b8', fontSize: '10px'}}>No Img</span>
+                            </div>
+                          )}
+                          <strong>{res.name}</strong>
+                        </td>
                         <td>
                            <span className="category-pill">{res.type.replace('_', ' ')}</span>
                         </td>
