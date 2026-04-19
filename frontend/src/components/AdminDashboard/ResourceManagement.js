@@ -48,7 +48,17 @@ const ResourceManagement = () => {
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name === 'name') {
+      if (!/^[a-zA-Z0-9\s]*$/.test(value)) return;
+    }
+
+    if (name === 'capacity') {
+      if (value !== '' && !/^\d+$/.test(value)) return;
+    }
+
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
@@ -144,7 +154,7 @@ const ResourceManagement = () => {
             <form onSubmit={handleSubmit} className="rm-form">
               <div className="form-group">
                 <label>Resource Name</label>
-                <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="e.g. Hall A" />
+                <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="e.g. Hall A" pattern="[a-zA-Z0-9\s]+" title="Only alphanumeric characters and spaces allowed" />
               </div>
               <div className="form-group">
                 <label>Resource Type</label>
@@ -157,7 +167,7 @@ const ResourceManagement = () => {
               </div>
               <div className="form-group">
                 <label>Capacity</label>
-                <input type="number" name="capacity" value={formData.capacity} onChange={handleChange} placeholder="e.g. 50" />
+                <input type="text" name="capacity" value={formData.capacity} onChange={handleChange} placeholder="e.g. 50" onKeyDown={(e) => { if(['e', 'E', '+', '-', '.'].includes(e.key)) e.preventDefault(); }} />
               </div>
               <div className="form-group">
                 <label>Location</label>
