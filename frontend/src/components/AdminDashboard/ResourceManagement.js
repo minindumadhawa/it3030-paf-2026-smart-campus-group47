@@ -1,15 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { 
+  Plus, Search, Filter, Edit2, Trash2, 
+  ArrowLeft, MapPin, Users, Settings, 
+  CheckCircle, XCircle, Box, Layout, 
+  Calendar, Info, Shield
+} from 'lucide-react';
 import './ResourceManagement.css';
 
 const ResourceManagement = () => {
   const navigate = useNavigate();
   const [resources, setResources] = useState([]);
   const [formData, setFormData] = useState({
-    name: '', type: 'LECTURE_HALL', capacity: '', location: '', availabilityWindows: '', status: 'ACTIVE'
+    name: '', type: 'LECTURE_HALL', capacity: '', location: '', availabilityWindows: '', status: 'ACTIVE', imageUrl: ''
   });
   const [editId, setEditId] = useState(null);
   const [notification, setNotification] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Filtering states
   const [filterType, setFilterType] = useState('ALL');
@@ -17,8 +25,17 @@ const ResourceManagement = () => {
   const [filterMinCapacity, setFilterMinCapacity] = useState('');
 
   useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      if (parsedUser.role !== 'ADMIN') {
+        navigate('/login');
+      }
+    } else {
+      navigate('/login');
+    }
     fetchResources();
-  }, []);
+  }, [navigate]);
 
   const fetchResources = async () => {
     try {
@@ -33,36 +50,70 @@ const ResourceManagement = () => {
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name === 'name') {
+      if (!/^[a-zA-Z0-9\s]*$/.test(value)) return;
+    }
+
+    if (name === 'capacity') {
+      if (value !== '' && !/^\d+$/.test(value)) return;
+    }
+
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const isUpdate = editId !== null;
-    const url = isUpdate ? `http://localhost:8080/api/resources/${editId}` : 'http://localhost:8080/api/resources';
-    const method = isUpdate ? 'PUT' : 'POST';
+    setIsUploading(true);
+    let currentImageUrl = formData.imageUrl;
 
     try {
+      if (selectedFile) {
+        const uploadData = new FormData();
+        uploadData.append("file", selectedFile);
+        const uploadRes = await fetch('http://localhost:8080/api/resources/upload-image', {
+          method: 'POST',
+          body: uploadData
+        });
+        if (uploadRes.ok) {
+          const result = await uploadRes.json();
+          currentImageUrl = result.url;
+        } else {
+          throw new Error('Image upload failed');
+        }
+      }
+
+      const payload = { ...formData, imageUrl: currentImageUrl };
+      const isUpdate = editId !== null;
+      const url = isUpdate ? `http://localhost:8080/api/resources/${editId}` : 'http://localhost:8080/api/resources';
+      const method = isUpdate ? 'PUT' : 'POST';
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
       if (response.ok) {
         setNotification(isUpdate ? 'Resource updated successfully!' : 'Resource added successfully!');
-        setFormData({ name: '', type: 'LECTURE_HALL', capacity: '', location: '', availabilityWindows: '', status: 'ACTIVE' });
+        setFormData({ name: '', type: 'LECTURE_HALL', capacity: '', location: '', availabilityWindows: '', status: 'ACTIVE', imageUrl: '' });
+        setSelectedFile(null);
         setEditId(null);
         fetchResources();
         setTimeout(() => setNotification(''), 3000);
       }
     } catch (err) {
       setNotification('An error occurred while saving.');
+    } finally {
+      setIsUploading(false);
     }
   };
 
   const handleEdit = (resource) => {
     setFormData(resource);
+    setSelectedFile(null);
     setEditId(resource.id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id) => {
@@ -79,7 +130,6 @@ const ResourceManagement = () => {
     }
   };
 
-  // Filter Computation
   const filteredResources = resources.filter(res => {
     let matchType = filterType === 'ALL' || res.type === filterType;
     let matchLocation = filterLocation.trim() === '' || (res.location && res.location.toLowerCase().includes(filterLocation.toLowerCase()));
@@ -98,26 +148,38 @@ const ResourceManagement = () => {
     <div className="rm-container">
       <nav className="rm-nav">
         <div className="nav-logo" onClick={() => navigate('/admin-dashboard')} style={{cursor: 'pointer'}}>
-          Smart Campus <span>| Admin Control</span>
+          SLIIT Smart Campus <span>| Admin Control</span>
         </div>
-        <button className="back-btn" onClick={() => navigate('/admin-dashboard')}>← Back to Dashboard</button>
+        <button className="back-btn" onClick={() => navigate('/admin-dashboard')}>
+          <ArrowLeft size={16} /> Back to Dashboard
+        </button>
       </nav>
 
       <main className="rm-main">
         <header className="rm-header">
-          <h1>Manage Resources Catalogue</h1>
-          <p>Maintain lecture halls, labs, meeting rooms, and equipment.</p>
+          <h1>
+            <Layout className="icon-orange" size={32} style={{marginRight: '12px', verticalAlign: 'middle'}}/>
+            Manage Resources Catalogue
+          </h1>
+          <p>Maintain lecture halls, labs, meeting rooms, and campus equipment.</p>
         </header>
 
-        {notification && <div className="rm-notification">{notification}</div>}
+        {notification && (
+          <div className="rm-notification">
+            <CheckCircle size={18} style={{marginRight: '8px'}} /> {notification}
+          </div>
+        )}
 
         <div className="rm-content-grid">
-          <div className="rm-form-card premium-glass-admin">
-            <h3>{editId ? 'Edit Resource' : 'Add New Resource'}</h3>
+          <div className="rm-form-card">
+            <h3>
+              {editId ? <Edit2 size={20} className="icon-orange" /> : <Plus size={20} className="icon-orange" />}
+              {editId ? 'Edit Resource' : 'Add New Resource'}
+            </h3>
             <form onSubmit={handleSubmit} className="rm-form">
               <div className="form-group">
                 <label>Resource Name</label>
-                <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="e.g. Hall A" />
+                <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="e.g. Hall A" pattern="[a-zA-Z0-9\s]+" title="Only alphanumeric characters and spaces allowed" />
               </div>
               <div className="form-group">
                 <label>Resource Type</label>
@@ -130,11 +192,16 @@ const ResourceManagement = () => {
               </div>
               <div className="form-group">
                 <label>Capacity</label>
-                <input type="number" name="capacity" value={formData.capacity} onChange={handleChange} placeholder="e.g. 50" />
+                <input type="text" name="capacity" value={formData.capacity} onChange={handleChange} placeholder="e.g. 50" onKeyDown={(e) => { if(['e', 'E', '+', '-', '.'].includes(e.key)) e.preventDefault(); }} />
               </div>
               <div className="form-group">
                 <label>Location</label>
                 <input type="text" name="location" value={formData.location} onChange={handleChange} required placeholder="e.g. Building C, Floor 2" />
+              </div>
+              <div className="form-group">
+                <label>Resource Image</label>
+                <input type="file" accept="image/*" onChange={(e) => setSelectedFile(e.target.files[0])} />
+                {formData.imageUrl && !selectedFile && <small style={{display: 'block', marginTop: '5px', color: '#64748b'}}>Current image exists. Upload a new one to replace.</small>}
               </div>
               <div className="form-group">
                 <label>Availability Windows</label>
@@ -148,53 +215,50 @@ const ResourceManagement = () => {
                 </select>
               </div>
               <div className="form-actions">
-                <button type="submit" className="save-btn">{editId ? 'Update Resource' : 'Add Resource'}</button>
-                {editId && <button type="button" className="cancel-btn" onClick={() => { setEditId(null); setFormData({ name: '', type: 'LECTURE_HALL', capacity: '', location: '', availabilityWindows: '', status: 'ACTIVE' }); }}>Cancel</button>}
+                <button type="submit" className="save-btn" disabled={isUploading}>
+                  {isUploading ? 'Uploading...' : (editId ? 'Update Resource' : 'Add Resource')}
+                </button>
+                {editId && (
+                  <button type="button" className="cancel-btn" onClick={() => { 
+                    setEditId(null); 
+                    setSelectedFile(null);
+                    setFormData({ name: '', type: 'LECTURE_HALL', capacity: '', location: '', availabilityWindows: '', status: 'ACTIVE', imageUrl: '' }); 
+                  }}>Cancel</button>
+                )}
               </div>
             </form>
           </div>
 
-          <div className="rm-table-card premium-glass-admin">
-            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '15px', gap: '15px' }}>
-              <h3 style={{ margin: 0, borderBottom: 'none', paddingBottom: 0 }}>Current Catalogue</h3>
+          <div className="rm-table-card">
+            <div className="table-header-flex" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', gap: '20px' }}>
+              <h3 style={{ margin: 0, paddingBottom: 0, borderBottom: 'none' }}>
+                <Box size={22} className="icon-orange" /> Current Catalogue
+              </h3>
               
               <div className="filters-container" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                <select 
-                  value={filterType} 
-                  onChange={(e) => setFilterType(e.target.value)}
-                  style={{ background: 'rgba(15, 23, 42, 0.6)', color: 'white', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '8px 12px', borderRadius: '6px', fontSize: '13px' }}
-                >
-                  <option value="ALL">All Types</option>
-                  <option value="LECTURE_HALL">Lecture Hall</option>
-                  <option value="LAB">Lab</option>
-                  <option value="MEETING_ROOM">Meeting Room</option>
-                  <option value="EQUIPMENT">Equipment</option>
-                </select>
+                <div className="filter-item" style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                  <Filter size={14} color="#64748b" />
+                  <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="filter-select">
+                    <option value="ALL">All Types</option>
+                    <option value="LECTURE_HALL">Lecture Hall</option>
+                    <option value="LAB">Lab</option>
+                    <option value="MEETING_ROOM">Meeting Room</option>
+                    <option value="EQUIPMENT">Equipment</option>
+                  </select>
+                </div>
                 
-                <input 
-                  type="text" 
-                  placeholder="Search Location..." 
-                  value={filterLocation}
-                  onChange={(e) => setFilterLocation(e.target.value)}
-                  style={{ background: 'rgba(15, 23, 42, 0.6)', color: 'white', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '8px 12px', borderRadius: '6px', fontSize: '13px' }}
-                />
+                <div className="filter-item" style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                  <MapPin size={14} color="#64748b" />
+                  <input type="text" placeholder="Location..." value={filterLocation} onChange={(e) => setFilterLocation(e.target.value)} className="filter-select" />
+                </div>
                 
-                <input 
-                  type="number" 
-                  placeholder="Min Capacity" 
-                  value={filterMinCapacity}
-                  onChange={(e) => setFilterMinCapacity(e.target.value)}
-                  style={{ background: 'rgba(15, 23, 42, 0.6)', color: 'white', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '8px 12px', borderRadius: '6px', width: '110px', fontSize: '13px' }}
-                  min="0"
-                />
+                <div className="filter-item" style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                  <Users size={14} color="#64748b" />
+                  <input type="number" placeholder="Min Cap" value={filterMinCapacity} onChange={(e) => setFilterMinCapacity(e.target.value)} className="filter-select" style={{width: '90px'}} min="0" />
+                </div>
                 
-                <button 
-                  onClick={() => { setFilterType('ALL'); setFilterLocation(''); setFilterMinCapacity(''); }}
-                  style={{ background: 'rgba(255, 255, 255, 0.1)', color: 'white', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', transition: 'background 0.2s' }}
-                  onMouseOver={(e) => e.target.style.background = 'rgba(244, 63, 94, 0.2)'}
-                  onMouseOut={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.1)'}
-                >
-                  Clear Filters
+                <button className="cancel-btn" style={{padding: '8px 15px'}} onClick={() => { setFilterType('ALL'); setFilterLocation(''); setFilterMinCapacity(''); }}>
+                   Clear
                 </button>
               </div>
             </div>
@@ -203,12 +267,12 @@ const ResourceManagement = () => {
               <table className="rm-table">
                 <thead>
                   <tr>
-                    <th>Name</th>
+                    <th><Info size={14} style={{marginRight: '6px'}}/> Resource</th>
                     <th>Type</th>
                     <th>Capacity</th>
                     <th>Location</th>
                     <th>Status</th>
-                    <th>Actions</th>
+                    <th style={{textAlign: 'right'}}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -217,18 +281,32 @@ const ResourceManagement = () => {
                   ) : (
                     filteredResources.map(res => (
                       <tr key={res.id}>
-                        <td>{res.name}</td>
+                        <td style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                          {res.imageUrl ? (
+                            <img src={res.imageUrl} alt={res.name} style={{width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover'}} />
+                          ) : (
+                            <div style={{width: '40px', height: '40px', borderRadius: '8px', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                              <Layout size={20} color="#94a3b8" />
+                            </div>
+                          )}
+                          <strong>{res.name}</strong>
+                        </td>
                         <td>{res.type.replace('_', ' ')}</td>
                         <td>{res.capacity || 'N/A'}</td>
                         <td>{res.location}</td>
                         <td>
                           <span className={`status-pill ${res.status === 'ACTIVE' ? 'active-pill' : 'out-pill'}`}>
+                            {res.status === 'ACTIVE' ? <CheckCircle size={12} style={{marginRight: '4px'}}/> : <XCircle size={12} style={{marginRight: '4px'}}/>}
                             {res.status.replace('_', ' ')}
                           </span>
                         </td>
-                        <td className="actions-cell">
-                          <button className="edit-btn" onClick={() => handleEdit(res)}>Edit</button>
-                          <button className="delete-btn" onClick={() => handleDelete(res.id)}>Delete</button>
+                        <td className="actions-cell" style={{textAlign: 'right'}}>
+                          <button className="edit-btn" onClick={() => handleEdit(res)} title="Edit Resource">
+                            <Edit2 size={14} />
+                          </button>
+                          <button className="delete-btn" onClick={() => handleDelete(res.id)} title="Delete Resource">
+                            <Trash2 size={14} />
+                          </button>
                         </td>
                       </tr>
                     ))
