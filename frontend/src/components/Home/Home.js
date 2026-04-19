@@ -2,6 +2,7 @@ import React from 'react';
 import './Home.css';
 import { Building2, Wrench, Calendar, Bell, ChevronRight, UserCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import campusOfficeImg from '../../images/campus_office.png';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -43,6 +44,7 @@ const Home = () => {
           </div>
         </div>
         <div className="hero-visual">
+          <img src={campusOfficeImg} alt="Campus Office" className="hero-image" />
           {/* Decorative glass elements for the visual side */}
           <div className="glass-card decorative-card card-1">
             <Calendar className="card-icon" size={32} />
