@@ -7,7 +7,7 @@ const NotificationList = ({ userId, onRead }) => {
 
   useEffect(() => {
     if (!userId) {
-      setLoading(false); // ✅ Fix - userId නැත්නම් loading නවත්වනවා
+      setLoading(false); // FIX - Stop loading if userId is not available
       return;
     }
     fetchNotifications();
