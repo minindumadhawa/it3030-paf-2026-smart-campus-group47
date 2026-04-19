@@ -101,4 +101,68 @@ public class UserController {
         errorResponse.put("error", "Access denied. Account not found.");
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
+
+    @PostMapping("/google-login")
+    public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        String fullName = payload.get("fullName");
+
+        if (email == null || email.isEmpty()) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Email is required for Google Login.");
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
+
+        // First check if the email belongs to an Admin
+        Optional<Admin> adminOptional = adminRepository.findByEmail(email);
+        if (adminOptional.isPresent()) {
+            Admin existingAdmin = adminOptional.get();
+            Map<String, Object> response = new HashMap<>();
+            response.put("id", existingAdmin.getId());
+            response.put("fullName", existingAdmin.getFullName());
+            response.put("email", existingAdmin.getEmail());
+            response.put("role", "ADMIN");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // Finally check if the email belongs to a Technician
+        Optional<backend.model.Technician> technicianOptional = technicianRepository.findByEmail(email);
+        if (technicianOptional.isPresent()) {
+            backend.model.Technician existingTech = technicianOptional.get();
+            Map<String, Object> response = new HashMap<>();
+            response.put("id", existingTech.getId());
+            response.put("fullName", existingTech.getFullName());
+            response.put("email", existingTech.getEmail());
+            response.put("specialization", existingTech.getSpecialization());
+            response.put("role", "TECHNICIAN");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // Then check if the email belongs to a User
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isPresent()) {
+            User existingUser = userOptional.get();
+            Map<String, Object> response = new HashMap<>();
+            response.put("id", existingUser.getId());
+            response.put("fullName", existingUser.getFullName());
+            response.put("email", existingUser.getEmail());
+            response.put("role", "USER");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // If not found, create a new User automatically for Google Auth
+        User newUser = new User();
+        newUser.setEmail(email);
+        newUser.setFullName(fullName != null && !fullName.isEmpty() ? fullName : email.substring(0, email.indexOf("@")));
+        newUser.setPassword(java.util.UUID.randomUUID().toString()); // strong random password
+
+        User savedUser = userRepository.save(newUser);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", savedUser.getId());
+        response.put("fullName", savedUser.getFullName());
+        response.put("email", savedUser.getEmail());
+        response.put("role", "USER");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
