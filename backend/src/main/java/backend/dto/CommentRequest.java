@@ -1,8 +1,5 @@
 package backend.dto;
 
-import backend.model.Comment;
-import java.time.LocalDateTime;
-
 public class CommentRequest {
     private String content;
     private Long userId;
