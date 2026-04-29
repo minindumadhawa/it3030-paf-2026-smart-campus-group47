@@ -186,7 +186,48 @@
   color: #94a3b8;
   background: #f0f4ff;
 }
+/* View All Notifications Button */
+.view-all-notifications-btn {
+    background: none;
+    border: none;
+    color: #f97316;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 0;
+    margin-top: 16px;
+    transition: all 0.2s;
+    font-style: italic;
+}
 
+.view-all-notifications-btn:hover {
+    color: #ea580c;
+    transform: translateX(4px);
+}
+
+.notifications-action-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
+    background: #f8f9ff;
+    border-radius: 8px;
+    padding: 24px;
+    margin-top: 16px;
+}
+
+.notifications-action-area .view-all-notifications-btn {
+    margin-top: 0;
+    font-size: 16px;
+}
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
 @keyframes fadeInDown {
   from {
     opacity: 0;
