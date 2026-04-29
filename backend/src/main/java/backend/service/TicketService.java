@@ -33,6 +33,9 @@ public class TicketService {
     @Autowired
     private backend.repository.TechnicianRepository technicianRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     public TicketResponse createTicket(TicketRequest request) {
         if (request.getUserId() == null) throw new ValidationException("User ID is required.");
         if (request.getCategory() == null) throw new ValidationException("Category is required.");
@@ -122,6 +125,11 @@ public class TicketService {
         ticket.setResolvedAt(null); // Clear resolvedAt if reassigned
         Ticket saved = ticketRepository.save(ticket);
 
+        // Send notification to assigned technician
+        if (request.getTechnicianId() != null) {
+            notificationService.sendTicketAssignedNotification(request.getTechnicianId(), saved.getId());
+        }
+
         // Automatically post assignment message as a comment
         if (request.getMessage() != null && !request.getMessage().trim().isEmpty()) {
             CommentRequest commentRequest = new CommentRequest();
@@ -172,7 +180,19 @@ public class TicketService {
             // If moved back from resolved/closed state, clear the timer
             ticket.setResolvedAt(null);
         }
-        return mapToResponse(ticketRepository.save(ticket));
+
+        Ticket saved = ticketRepository.save(ticket);
+
+        // Send notifications based on status change
+        if (request.getStatus() == TicketStatus.IN_PROGRESS) {
+            notificationService.sendTicketStatusChangeNotification(ticket.getUser().getId(), saved.getId(), "In Progress");
+        } else if (request.getStatus() == TicketStatus.RESOLVED) {
+            notificationService.sendTicketResolvedNotification(ticket.getUser().getId(), saved.getId());
+        } else if (request.getStatus() == TicketStatus.REJECTED) {
+            notificationService.sendTicketRejectionNotification(ticket.getUser().getId(), saved.getId(), request.getRejectionReason());
+        }
+
+        return mapToResponse(saved);
     }
 
     public TicketResponse updateResolution(Long ticketId, TicketResolutionRequest request) {
