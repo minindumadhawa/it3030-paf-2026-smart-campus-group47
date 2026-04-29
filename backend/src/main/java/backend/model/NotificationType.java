@@ -1,0 +1,12 @@
+package backend.model;
+
+public enum NotificationType {
+    BOOKING_APPROVAL,
+    BOOKING_REJECTION,
+    BOOKING_CANCELLATION,
+    TICKET_STATUS_CHANGE,
+    TICKET_ASSIGNED,
+    TICKET_REJECTION,
+    NEW_COMMENT,
+    TICKET_RESOLVED
+}
