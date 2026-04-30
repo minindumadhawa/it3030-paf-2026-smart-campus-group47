@@ -39,6 +39,9 @@ public class CommentService {
     @Autowired
     private TechnicianRepository technicianRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     public CommentResponse addComment(Long ticketId, CommentRequest request) {
         if (request.getContent() == null || request.getContent().trim().isEmpty()) {
             throw new ValidationException("Comment content cannot be empty.");
@@ -51,25 +54,37 @@ public class CommentService {
         comment.setContent(request.getContent().trim());
         comment.setTicket(ticket);
         
+        String commenterName = null;
         if ("ADMIN".equalsIgnoreCase(request.getRole())) {
             Admin admin = adminRepository.findById(request.getUserId())
                     .orElseThrow(() -> new TicketNotFoundException("Admin not found with id: " + request.getUserId()));
             comment.setAdmin(admin);
+            commenterName = admin.getFullName();
             // Satistfy NOT NULL db constraint
             comment.setUser(ticket.getUser()); 
         } else if ("TECHNICIAN".equalsIgnoreCase(request.getRole())) {
             Technician tech = technicianRepository.findById(request.getUserId())
                     .orElseThrow(() -> new TicketNotFoundException("Technician not found with id: " + request.getUserId()));
             comment.setTechnician(tech);
+            commenterName = tech.getFullName();
             // Satistfy NOT NULL db constraint
             comment.setUser(ticket.getUser());
         } else {
             User user = userRepository.findById(request.getUserId())
                     .orElseThrow(() -> new TicketNotFoundException("User not found with id: " + request.getUserId()));
             comment.setUser(user);
+            commenterName = user.getFullName();
         }
 
-        return CommentResponse.fromEntity(commentRepository.save(comment));
+        Comment savedComment = commentRepository.save(comment);
+
+        // Send notification to ticket owner if comment is from staff and not from the ticket owner themselves
+        if (("ADMIN".equalsIgnoreCase(request.getRole()) || "TECHNICIAN".equalsIgnoreCase(request.getRole())) 
+            && !ticket.getUser().getId().equals(request.getUserId())) {
+            notificationService.sendNewCommentNotification(ticket.getUser().getId(), ticketId, savedComment.getId(), commenterName);
+        }
+
+        return CommentResponse.fromEntity(savedComment);
     }
 
     public List<CommentResponse> getCommentsByTicket(Long ticketId) {

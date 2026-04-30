@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, PlusCircle, ArrowRight } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, ArrowRight, Bell } from 'lucide-react';
 import './UserDashboard.css';
+import NotificationPanel from '../Notification/NotificationPanel';
 
 const UserDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -17,11 +19,22 @@ const UserDashboard = () => {
         navigate('/technician-dashboard');
       } else {
         setUser(parsedUser);
+        fetchUnreadCount(parsedUser.id);
       }
     } else {
       navigate('/login');
     }
   }, [navigate]);
+
+  const fetchUnreadCount = async (userId) => {
+    try {
+      const response = await fetch(`/api/notifications/user/${userId}/unread-count`);
+      const data = await response.json();
+      setUnreadCount(data.unreadCount || 0);
+    } catch (error) {
+      console.error('Error fetching unread count:', error);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -33,9 +46,12 @@ const UserDashboard = () => {
   return (
     <div className="dashboard-container">
       <nav className="dashboard-nav">
-        <div className="nav-logo">Smart Campus Hub</div>
-        <button className="logout-btn" onClick={handleLogout}>Logout</button>
-      </nav>
+  <div className="nav-logo">Smart Campus Hub</div>
+  <div className="nav-right">
+    <NotificationPanel userId={user.id} />
+    <button className="logout-btn" onClick={handleLogout}>Logout</button>
+  </div>
+</nav>
 
       <main className="dashboard-main">
         <header className="dashboard-header">
@@ -90,9 +106,16 @@ const UserDashboard = () => {
           </div>
 
           <div className="widget-card premium-glass">
-            <h3>System Notifications</h3>
-            <p className="empty-state">Inbox is empty. Stay tuned!</p>
+          <h3>System Notifications</h3>
+          <div className="notifications-action-area">
+            <button
+            className="view-all-notifications-btn"
+            onClick={() => navigate('/notifications')}
+            >
+            View all notifications <ArrowRight size={16} />
+            </button>
           </div>
+</div>
         </section>
       </main>
     </div>

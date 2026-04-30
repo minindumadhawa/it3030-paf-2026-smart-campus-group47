@@ -28,6 +28,9 @@ public class BookingService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     public BookingResponse createBooking(BookingRequest request) {
         Resource resource = resourceRepository.findById(request.getResourceId())
                 .orElseThrow(() -> new RuntimeException("Resource not found"));
@@ -70,6 +73,14 @@ public class BookingService {
         }
         
         Booking saved = bookingRepository.save(booking);
+        
+        // Send notification based on the new status
+        if (newStatus == BookingStatus.APPROVED) {
+            notificationService.sendBookingApprovalNotification(saved.getUser().getId(), saved.getId());
+        } else if (newStatus == BookingStatus.REJECTED) {
+            notificationService.sendBookingRejectionNotification(saved.getUser().getId(), saved.getId(), adminReason != null ? adminReason : "No reason provided");
+        }
+        
         return mapToResponse(saved);
     }
 

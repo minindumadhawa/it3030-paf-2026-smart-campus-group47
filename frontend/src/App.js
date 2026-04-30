@@ -15,6 +15,7 @@ import BookingForm from "./components/Bookings/BookingForm";
 import MyBookings from "./components/Bookings/MyBookings";
 import AdminBookingManagement from "./components/Bookings/AdminBookingManagement";
 import TechnicianDashboard from "./components/Technician/TechnicianDashboard";
+import CampusAlerts from "./components/Notification/CampusAlerts";
 import { NotificationProvider } from "./context/NotificationContext";
 
 function App(){
@@ -40,6 +41,8 @@ function App(){
           <Route path="/admin/bookings" element={<AdminBookingManagement></AdminBookingManagement>}/>
           {/* Technician Portal */}
           <Route path="/technician-dashboard" element={<TechnicianDashboard></TechnicianDashboard>}/>
+          {/* Notifications */}
+          <Route path="/notifications" element={<CampusAlerts></CampusAlerts>}/>
         </Routes>
       </div>
     </NotificationProvider>
