@@ -2,7 +2,7 @@ import React from 'react';
 import './Home.css';
 import { Building2, Wrench, Calendar, Bell, ChevronRight, UserCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import campusOfficeImg from '../../images/campus_office.png';
+import campusOfficeImg from '../../images/SLIIT-malabe.jpg';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -69,7 +69,7 @@ const Home = () => {
           <h2>Our Core Services</h2>
           <p>Streamlined access to essential campus operations</p>
         </div>
-        
+
         <div className="services-grid">
           {/* Facility Bookings Card */}
           <div className="service-card interactive-card">
